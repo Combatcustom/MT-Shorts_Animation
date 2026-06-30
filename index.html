@@ -43,7 +43,7 @@
         shadow-intensity="1">
     </model-viewer>
 
-    <div class="controls-hint">Premium Customizer Showcase. 10 Colorways. Speed: 1.2s</div>
+    <div class="controls-hint">Premium Customizer Showcase. Satin Fabric Finish.</div>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
@@ -117,7 +117,6 @@
 
         let comboIndex = 0;
 
-        // Core execution function wrapped safely to run whenever ready
         function startColorLoop() {
             const materials = viewer.model.materials;
 
@@ -130,6 +129,16 @@
             const logoPanels = ["LogoPanel"];
             const stitchingPanels = ["Stitching"];
 
+            // 🧵 SATIN FABRIC INITIALIZER: Run once to change surface properties
+            materials.forEach(material => {
+                // Apply a soft, diffused satin blur factor to the main fabric components
+                if ([...leftSide, ...rightSide, ...midLeftPanel, ...midRightPanel, ...waistbandPanels, ...trimPanels].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(0.65); // Softens the reflection (destroys the leather plastic look)
+                    material.pbrMetallicRoughness.setMetallicFactor(0.15); // Adds subtle premium fabric highlight depth
+                }
+            });
+
+            // Color swapping interval loop
             setInterval(() => {
                 const currentCombo = designCombos[comboIndex];
 
@@ -148,7 +157,6 @@
             }, 1200);
         }
 
-        // ⚡ Anti-Race Condition Check: Run instantly if already cached, otherwise listen for load
         if (viewer.loaded) {
             startColorLoop();
         } else {
