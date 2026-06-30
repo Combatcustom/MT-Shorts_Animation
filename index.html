@@ -17,10 +17,10 @@
             font-family: sans-serif;
             overflow: hidden;
         }
-        /* We scaled the box down to force the model to fill the screen closely */
         model-viewer {
             width: 95vw;
             height: 95vh;
+            transform: translateY(4%);
             --poster-color: transparent;
         }
         .controls-hint {
@@ -38,12 +38,12 @@
         src="MT SHORTS.glb" 
         alt="CombatCustom Muay Thai Shorts" 
         auto-rotate 
-        rotation-per-second="75deg"
+        rotation-per-second="35deg"
         interaction-prompt="none"
         shadow-intensity="1">
     </model-viewer>
 
-    <div class="controls-hint">Alternating Color Loop. Speed: 1.2s</div>
+    <div class="controls-hint">Smooth Spin Mode. Colors Changing Fast.</div>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
@@ -58,51 +58,43 @@
         const NEON_GREEN = [0.1, 0.85, 0.1, 1.0];
         const ORANGE     = [0.9, 0.4, 0.0, 1.0];
 
-        // 👔 8-STAGE DESIGN COMBOS LOOP (Alternating Solid vs Split-Panel)
+        // 👔 Current 8-Stage Design Loop
         const designCombos = [
-            // 1. SOLID COMBOS
             {
                 name: "Combo 1: Stealth Gold (Solid)",
                 leftPanels: BLACK, rightPanels: BLACK, midLeft: BLACK, midRight: BLACK,
                 waistband: GOLD, trim: GOLD, logo: BLACK, stitching: BLACK
             },
-            // 2. SPLIT COMBOS (Right side vs Left side)
             {
                 name: "Combo 2: Fire & Ice (Split)",
                 leftPanels: BLUE, rightPanels: RED, midLeft: BLUE, midRight: RED,
                 waistband: BLACK, trim: WHITE, logo: WHITE, stitching: WHITE
             },
-            // 3. SOLID COMBOS
             {
                 name: "Combo 3: Classic Muay Thai (Solid)",
                 leftPanels: RED, rightPanels: RED, midLeft: RED, midRight: RED,
                 waistband: WHITE, trim: BLUE, logo: WHITE, stitching: WHITE
             },
-            // 4. SPLIT COMBOS
             {
                 name: "Combo 4: Tokyo Neon (Split)",
                 leftPanels: CHARCOAL, rightPanels: NEON_GREEN, midLeft: CHARCOAL, midRight: NEON_GREEN,
                 waistband: BLACK, trim: BLACK, logo: NEON_GREEN, stitching: BLACK
             },
-            // 5. SOLID COMBOS
             {
                 name: "Combo 5: Royal Gold (Solid)",
                 leftPanels: BLUE, rightPanels: BLUE, midLeft: BLUE, midRight: BLUE,
                 waistband: BLACK, trim: GOLD, logo: GOLD, stitching: BLACK
             },
-            // 6. SPLIT COMBOS
             {
                 name: "Combo 6: Tiger Spirit (Split)",
                 leftPanels: ORANGE, rightPanels: BLACK, midLeft: ORANGE, midRight: BLACK,
                 waistband: GOLD, trim: WHITE, logo: BLACK, stitching: GOLD
             },
-            // 7. SOLID COMBOS
             {
                 name: "Combo 7: Monochrome Ice (Solid)",
                 leftPanels: WHITE, rightPanels: WHITE, midLeft: WHITE, midRight: WHITE,
                 waistband: CHARCOAL, trim: BLACK, logo: WHITE, stitching: CHARCOAL
             },
-            // 8. SPLIT COMBOS
             {
                 name: "Combo 8: Electric Candy (Split)",
                 leftPanels: BLUE, rightPanels: ORANGE, midLeft: BLUE, midRight: ORANGE,
@@ -115,7 +107,6 @@
         viewer.addEventListener("load", () => {
             const materials = viewer.model.materials;
 
-            // Target arrays isolated cleanly based on your mapping structure
             const leftSide = ["FrontLeftPanel", "BackLeftPanel"];
             const rightSide = ["FrontRightPanel", "BackRightPanel"];
             const midLeftPanel = ["MidLeftPanel"];
@@ -126,40 +117,34 @@
             const logoPanels = ["LogoPanel"];
             const stitchingPanels = ["Stitching"];
 
-            // Quick transition cycle set to 1.2 seconds (1200ms)
             setInterval(() => {
                 const currentCombo = designCombos[comboIndex];
 
                 materials.forEach(material => {
-                    // Left Panels
                     if (leftSide.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.leftPanels);
                     }
-                    // Right Panels
                     if (rightSide.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.rightPanels);
                     }
-                    // Side Panels Left
                     if (midLeftPanel.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midLeft);
                     }
-                    // Side Panels Right
                     if (midRightPanel.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midRight);
                     }
-                    // WaistBand
+                    if (woodbandPanels = waistbandPanels.includes(material.name)) { // Fix minor typo handling
+                        material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.waistband);
+                    }
                     if (waistbandPanels.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.waistband);
                     }
-                    // Trim Piping
                     if (trimPanels.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.trim);
                     }
-                    // Logo Patch
                     if (logoPanels.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.logo);
                     }
-                    // Thread Stitching
                     if (stitchingPanels.includes(material.name)) {
                         material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.stitching);
                     }
