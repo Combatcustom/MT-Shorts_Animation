@@ -61,62 +61,99 @@
         const ELECTRIC_ORANGE = [0.95, 0.35, 0.0, 1.0];
         const NEON_YELLOW  = [0.85, 0.95, 0.0, 1.0];
 
-        // 👔 10 DISTINCT HIGH-VARIETY DESIGN COMBOS (No White Waistbands)
+        // 👔 10 DISTINCT HIGH-VARIETY DESIGN COMBOS
         const designCombos = [
-            // 1. Solid Classic
             {
                 name: "1. Onyx Gold",
                 leftPanels: BLACK, rightPanels: BLACK, midLeft: BLACK, midRight: BLACK,
                 waistband: GOLD, trim: GOLD, logo: BLACK, stitching: GOLD
             },
-            // 2. Left/Right Split
             {
                 name: "2. Crimson split Onyx",
                 leftPanels: CRIMSON, rightPanels: BLACK, midLeft: CRIMSON, midRight: BLACK,
                 waistband: CHARCOAL, trim: GOLD, logo: WHITE, stitching: CRIMSON
             },
-            // 3. Solid Military
             {
                 name: "3. Spec-Ops Olive",
                 leftPanels: MILITARY_OD, rightPanels: MILITARY_OD, midLeft: MILITARY_OD, midRight: MILITARY_OD,
                 waistband: BLACK, trim: CHARCOAL, logo: BLACK, stitching: WHITE
             },
-            // 4. Left/Right Split Neon Accent
             {
                 name: "4. Cyberpunk Split",
                 leftPanels: CHARCOAL, rightPanels: PURPLE, midLeft: CHARCOAL, midRight: PURPLE,
                 waistband: BLACK, trim: NEON_YELLOW, logo: NEON_YELLOW, stitching: PURPLE
             },
-            // 5. Solid Nautical Premium
             {
                 name: "5. Royal Anchor",
                 leftPanels: NAVY, rightPanels: NAVY, midLeft: NAVY, midRight: NAVY,
                 waistband: GOLD, trim: WHITE, logo: NAVY, stitching: GOLD
             },
-            // 6. Left/Right High-Contrast Split
             {
                 name: "6. Sunset Eclipse Split",
                 leftPanels: BLACK, rightPanels: ELECTRIC_ORANGE, midLeft: BLACK, midRight: ELECTRIC_ORANGE,
                 waistband: CHARCOAL, trim: BLACK, logo: WHITE, stitching: ELECTRIC_ORANGE
             },
-            // 7. Solid Vibrant Luxury
             {
                 name: "7. Pharaoh Purple",
                 leftPanels: PURPLE, rightPanels: PURPLE, midLeft: PURPLE, midRight: PURPLE,
                 waistband: GOLD, trim: GOLD, logo: BLACK, stitching: WHITE
             },
-            // 8. Left/Right Split Clean Style
             {
                 name: "8. Glacier Frost Split",
                 leftPanels: WHITE, rightPanels: NAVY, midLeft: WHITE, midRight: NAVY,
                 waistband: BLACK, trim: CRIMSON, logo: WHITE, stitching: NAVY
             },
-            // 9. Solid Tropical Punch
             {
                 name: "9. Miami Coral",
                 leftPanels: TROPIC_TEAL, rightPanels: TROPIC_TEAL, midLeft: TROPIC_TEAL, midRight: TROPIC_TEAL,
                 waistband: BLACK, trim: ELECTRIC_ORANGE, logo: WHITE, stitching: TROPIC_TEAL
             },
-            // 10. Left/Right High-Energy Split
             {
-                name: "10.
+                name: "10. Bloodsport Split",
+                leftPanels: CRIMSON, rightPanels: NAVY, midLeft: CRIMSON, midRight: NAVY,
+                waistband: GOLD, trim: WHITE, logo: CRIMSON, stitching: WHITE
+            }
+        ];
+
+        let comboIndex = 0;
+
+        // Core execution function wrapped safely to run whenever ready
+        function startColorLoop() {
+            const materials = viewer.model.materials;
+
+            const leftSide = ["FrontLeftPanel", "BackLeftPanel"];
+            const rightSide = ["FrontRightPanel", "BackRightPanel"];
+            const midLeftPanel = ["MidLeftPanel"];
+            const midRightPanel = ["MidRightPanel"];
+            const waistbandPanels = ["WaistBand"];
+            const trimPanels = ["BottomPiping", "Sidelines"];
+            const logoPanels = ["LogoPanel"];
+            const stitchingPanels = ["Stitching"];
+
+            setInterval(() => {
+                const currentCombo = designCombos[comboIndex];
+
+                materials.forEach(material => {
+                    if (leftSide.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.leftPanels);
+                    if (rightSide.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.rightPanels);
+                    if (midLeftPanel.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midLeft);
+                    if (midRightPanel.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midRight);
+                    if (waistbandPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.waistband);
+                    if (trimPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.trim);
+                    if (logoPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.logo);
+                    if (stitchingPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.stitching);
+                });
+
+                comboIndex = (comboIndex + 1) % designCombos.length;
+            }, 1200);
+        }
+
+        // ⚡ Anti-Race Condition Check: Run instantly if already cached, otherwise listen for load
+        if (viewer.loaded) {
+            startColorLoop();
+        } else {
+            viewer.addEventListener("load", startColorLoop);
+        }
+    </script>
+</body>
+</html>
