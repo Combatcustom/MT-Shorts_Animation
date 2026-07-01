@@ -23,6 +23,21 @@
             transform: translateY(-5%);
             --poster-color: transparent;
         }
+        /* 💡 Style rules for our floating hotspot container */
+        .logo-hotspot {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            pointer-events: none; /* Allows users to drag right through the logo */
+            transition: opacity 0.2s ease;
+        }
+        .logo-hotspot img {
+            width: 90px; /* Adjust scale size of the brand asset */
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.5));
+        }
         .controls-hint {
             position: absolute;
             bottom: 20px;
@@ -36,7 +51,7 @@
 <body>
 
     <model-viewer 
-        id="shortsViewerDynamic" 
+        id="shortsViewerHotspot" 
         src="MT SHORTS.glb" 
         alt="CombatCustom Muay Thai Shorts" 
         auto-rotate 
@@ -45,12 +60,18 @@
         environment-image="neutral"
         exposure="1.2"
         shadow-intensity="1">
+        
+        <button class="logo-hotspot" slot="hotspot-branding" data-position="0m 0.29m 0.11m" data-normal="0m 0m 1m">
+            <img id="dynamicLogoAsset" src="Combat Custom_Kicker Logo_White Clear BG.png" alt="Brand Feature">
+        </button>
+
     </model-viewer>
 
     <div class="controls-hint">CombatCustom Customizer Showcase</div>
 
     <script>
-        const viewer = document.querySelector("#shortsViewerDynamic");
+        const viewer = document.querySelector("#shortsViewerHotspot");
+        const logoImg = document.querySelector("#dynamicLogoAsset");
 
         function parseColor(input) {
             const clean = input.trim().toLowerCase();
@@ -69,123 +90,114 @@
             return [rLinear, gLinear, bLinear, 1.0];
         }
 
-        // ALL 12 GOOGLE SHEET COMBINATIONS + HARDCODED LOGO COLOR FOR PERFECT CONTRAST
         const designCombos = [
             {
                 frontLeft: parseColor("#631b1b"), backLeft: parseColor("#631b1b"), midLeft: parseColor("#631b1b"),
                 frontRight: parseColor("#631b1b"), backRight: parseColor("#631b1b"), midRight: parseColor("#631b1b"),
                 waistband: parseColor("#250000"), sidelines: parseColor("White"), logoPanel: parseColor("White"),
                 bottomPiping: parseColor("white"), stitching: parseColor("White"),
-                useWhiteLogo: false // White patch -> Needs Black Logos
+                useWhiteLogo: false 
             },
             {
                 frontLeft: parseColor("#ffbf00"), backLeft: parseColor("#ffbf00"), midLeft: parseColor("#ffbf00"),
                 frontRight: parseColor("#353535"), backRight: parseColor("#353535"), midRight: parseColor("#353535"),
                 waistband: parseColor("#4b4b4b"), sidelines: parseColor("#4b4b4b"), logoPanel: parseColor("#4b4b4b"),
                 bottomPiping: parseColor("White"), stitching: parseColor("black"),
-                useWhiteLogo: true // Grey patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#c3ccec"), backLeft: parseColor("#c3ccec"), midLeft: parseColor("#412727"),
                 frontRight: parseColor("#c3ccec"), backRight: parseColor("#c3ccec"), midRight: parseColor("#412727"),
                 waistband: parseColor("#412727"), sidelines: parseColor("#303030"), logoPanel: parseColor("#303030"),
                 bottomPiping: parseColor("#c3ccec"), stitching: parseColor("black"),
-                useWhiteLogo: true // Dark patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#789678"), backLeft: parseColor("#789678"), midLeft: parseColor("#789678"),
                 frontRight: parseColor("#789678"), backRight: parseColor("#789678"), midRight: parseColor("#789678"),
                 waistband: parseColor("#4b4b4b"), sidelines: parseColor("#4b4b4b"), logoPanel: parseColor("#4b4b4b"),
                 bottomPiping: parseColor("#789678"), stitching: parseColor("black"),
-                useWhiteLogo: true // Grey patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#331800"), backLeft: parseColor("#331800"), midLeft: parseColor("#331800"),
                 frontRight: parseColor("#9898ac"), backRight: parseColor("#9898ac"), midRight: parseColor("#9898ac"),
                 waistband: parseColor("#9898ac"), sidelines: parseColor("#cecece"), logoPanel: parseColor("#cecece"),
                 bottomPiping: parseColor("#9898ac"), stitching: parseColor("black"),
-                useWhiteLogo: false // Light grey patch -> Needs Black Logos
+                useWhiteLogo: false 
             },
             {
                 frontLeft: parseColor("#020101"), backLeft: parseColor("#020101"), midLeft: parseColor("#202044"),
                 frontRight: parseColor("#020101"), backRight: parseColor("#020101"), midRight: parseColor("#202044"),
                 waistband: parseColor("#020101"), sidelines: parseColor("#020101"), logoPanel: parseColor("#9b9b9b"),
                 bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("white"),
-                useWhiteLogo: false // Medium light patch -> Needs Black Logos
+                useWhiteLogo: false 
             },
             {
                 frontLeft: parseColor("#b9a973"), backLeft: parseColor("#b9a973"), midLeft: parseColor("#b9a973"),
                 frontRight: parseColor("#b9a973"), backRight: parseColor("#b9a973"), midRight: parseColor("#b9a973"),
                 waistband: parseColor("#0f2c0f"), sidelines: parseColor("#0f2c0f"), logoPanel: parseColor("#9b9b9b"),
                 bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("Black"),
-                useWhiteLogo: false // Medium light patch -> Needs Black Logos
+                useWhiteLogo: false 
             },
             {
                 frontLeft: parseColor("#446970"), backLeft: parseColor("#446970"), midLeft: parseColor("#446970"),
                 frontRight: parseColor("#bebebe"), backRight: parseColor("#bebebe"), midRight: parseColor("#bebebe"),
                 waistband: parseColor("#bebebe"), sidelines: parseColor("#1c2513"), logoPanel: parseColor("#1c2513"),
                 bottomPiping: parseColor("black"), stitching: parseColor("white"),
-                useWhiteLogo: true // Dark patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#c58c9c"), backLeft: parseColor("#c58c9c"), midLeft: parseColor("#5f5f80"),
                 frontRight: parseColor("#c58c9c"), backRight: parseColor("#c58c9c"), midRight: parseColor("#5f5f80"),
                 waistband: parseColor("#5f504f"), sidelines: parseColor("#b6b6b6"), logoPanel: parseColor("#b6b6b6"),
                 bottomPiping: parseColor("#b6b6b6"), stitching: parseColor("white"),
-                useWhiteLogo: false // Light patch -> Needs Black Logos
+                useWhiteLogo: false 
             },
             {
                 frontLeft: parseColor("#0a0030"), backLeft: parseColor("#0a0030"), midLeft: parseColor("#0a0030"),
                 frontRight: parseColor("#0a0030"), backRight: parseColor("#0a0030"), midRight: parseColor("#0a0030"),
                 waistband: parseColor("#5f504f"), sidelines: parseColor("#5f504f"), logoPanel: parseColor("black"),
                 bottomPiping: parseColor("white"), stitching: parseColor("black"),
-                useWhiteLogo: true // Solid black patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#2e4b2e"), backLeft: parseColor("#2e4b2e"), midLeft: parseColor("#2e4b2e"),
                 frontRight: parseColor("#aa0000"), backRight: parseColor("#aa0000"), midRight: parseColor("#aa0000"),
                 waistband: parseColor("white"), sidelines: parseColor("white"), logoPanel: parseColor("#2f2d38"),
                 bottomPiping: parseColor("white"), stitching: parseColor("white"),
-                useWhiteLogo: true // Very dark patch -> Needs White Logos
+                useWhiteLogo: true 
             },
             {
                 frontLeft: parseColor("#ff7633"), backLeft: parseColor("#ff7633"), midLeft: parseColor("#9898ac"),
                 frontRight: parseColor("#ff7633"), backRight: parseColor("#ff7633"), midRight: parseColor("#9898ac"),
                 waistband: parseColor("#9898ac"), sidelines: parseColor("#301c1c"), logoPanel: parseColor("#301c1c"),
                 bottomPiping: parseColor("white"), stitching: parseColor("black"),
-                useWhiteLogo: true // Dark brown/red patch -> Needs White Logos
+                useWhiteLogo: true 
             }
         ];
 
         let comboIndex = 0;
 
-        async function startColorAndBrandLoop() {
+        function startColorAndBrandLoop() {
             const materials = viewer.model.materials;
 
-            // Pre-load graphics textures
-            const textureKickerBlack = await viewer.createTexture("Combat Custom_Kicker Logo_Black Clear BG.png");
-            const textureKickerWhite = await viewer.createTexture("Combat Custom_Kicker Logo_White Clear BG.png");
-            const textureTextBlack   = await viewer.createTexture("CC_Main Logo_BLACK_V2.png");
-            const textureTextWhite   = await viewer.createTexture("CC_Main Logo_WHITE_V2.png");
-
-            // Apply standard non-shiny settings across all shorts panels initially
-            function resetMaterialSkins() {
-                materials.forEach(material => {
-                    if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand", "LogoPanel"].includes(material.name)) {
-                        material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
-                        material.pbrMetallicRoughness.setMetallicFactor(0.15); 
-                    }
-                    if (["BottomPiping", "Sidelines"].includes(material.name)) {
-                        material.pbrMetallicRoughness.setRoughnessFactor(1.0);  
-                        material.pbrMetallicRoughness.setMetallicFactor(0.0);   
-                    }
-                });
-            }
+            // Configure Material Engine base surface specs
+            materials.forEach(material => {
+                if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand", "LogoPanel"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
+                    material.pbrMetallicRoughness.setMetallicFactor(0.15); 
+                }
+                if (["BottomPiping", "Sidelines"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(1.0);  
+                    material.pbrMetallicRoughness.setMetallicFactor(0.0);   
+                }
+            });
 
             setInterval(() => {
                 const current = designCombos[comboIndex];
 
-                // 1. Set baseline colors
+                // 1. Set component base colors
                 materials.forEach(material => {
                     switch (material.name) {
                         case "FrontLeftPanel":  material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft); break;
@@ -202,31 +214,25 @@
                     }
                 });
 
-                // 2. Map exact overlay graphic onto target panel box
-                const logoPanelMaterial = materials.find(m => m.name === "LogoPanel");
-                if (logoPanelMaterial) {
-                    const isEvenPair = (comboIndex % 2 === 0);
-
-                    let targetTexture = null;
-                    if (isEvenPair) {
-                        targetTexture = current.useWhiteLogo ? textureKickerWhite : textureKickerBlack;
-                    } else {
-                        targetTexture = current.useWhiteLogo ? textureTextWhite : textureTextBlack;
-                    }
-
-                    // Dynamic layer binding assignment
-                    if (!logoPanelMaterial.pbrMetallicRoughness.baseColorTexture) {
-                        logoPanelMaterial.pbrMetallicRoughness.setBaseColorTexture(targetTexture);
-                    } else {
-                        logoPanelMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(targetTexture);
-                    }
+                // 2. 💡 Code-driven image source swapper using Hotspot interface layer
+                const isEvenPair = (comboIndex % 2 === 0);
+                if (isEvenPair) {
+                    logoImg.src = current.useWhiteLogo ? "Combat Custom_Kicker Logo_White Clear BG.png" : "Combat Custom_Kicker Logo_Black Clear BG.png";
+                } else {
+                    logoImg.src = current.useWhiteLogo ? "CC_Main Logo_WHITE_V2.png" : "CC_Main Logo_BLACK_V2.png";
                 }
-
-                // 3. 💡 RE-ENFORCE TEXTURE SPEC: Fixes the shininess issue by resetting physical properties after injecting the PNG
-                resetMaterialSkins();
 
                 comboIndex = (comboIndex + 1) % designCombos.length;
             }, 800);
+
+            // Hide logo gracefully if model turns backward during auto-rotation
+            viewer.addEventListener('camera-change', () => {
+                const hotspot = viewer.querySelector('.logo-hotspot');
+                if(hotspot) {
+                    // If hotspot faces away from view projection angle, auto-hide
+                    hotspot.style.opacity = hotspot.classList.contains('js-facing-away') ? '0' : '1';
+                }
+            });
         }
 
         if (viewer.loaded) {
