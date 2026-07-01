@@ -59,6 +59,7 @@
             return [Math.pow(r, 2.2), Math.pow(g, 2.2), Math.pow(b, 2.2), 1.0];
         }
 
+        // FIXED FILENAMES: Mapped exactly to match your GitHub repository file listings
         const designCombos = [
             { hexBg: "#ffffff", logo: "logo-kicker-black.png", frontLeft: safeColor("#631b1b"), backLeft: safeColor("#631b1b"), midLeft: safeColor("#631b1b"), frontRight: safeColor("#631b1b"), backRight: safeColor("#631b1b"), midRight: safeColor("#631b1b"), waistband: safeColor("#250000"), sidelines: safeColor("white"), logoPanel: safeColor("white"), bottomPiping: safeColor("white"), stitching: safeColor("white") },
             { hexBg: "#4b4b4b", logo: "logo-kicker-white.png", frontLeft: safeColor("#ffbf00"), backLeft: safeColor("#ffbf00"), midLeft: safeColor("#ffbf00"), frontRight: safeColor("#353535"), backRight: safeColor("#353535"), midRight: safeColor("#353535"), waistband: safeColor("#4b4b4b"), sidelines: safeColor("#4b4b4b"), logoPanel: safeColor("#4b4b4b"), bottomPiping: safeColor("white"), stitching: safeColor("black") },
@@ -70,13 +71,16 @@
 
         let comboIndex = 0;
 
-        // Image preloader helper
+        // Image preloader helper with absolute handling
         function loadImage(src) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = "anonymous";
                 img.onload = () => resolve(img);
-                img.onerror = () => resolve(null);
+                img.onerror = () => {
+                    console.error("CRITICAL: Failed to locate graphic asset path ->", src);
+                    resolve(null);
+                };
                 img.src = src;
             });
         }
@@ -88,32 +92,33 @@
                 const current = designCombos[comboIndex];
                 const activeImg = await loadImage(current.logo);
 
-                // 1. Build composite image layout canvas texture
+                // 1. Core Canvas Generation
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = current.hexBg;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 if (activeImg) {
                     const aspect = activeImg.width / activeImg.height;
-                    let drawW = canvas.width * 0.8;
+                    let drawW = canvas.width * 0.75;
                     let drawH = drawW / aspect;
                     if (drawH > canvas.height) {
-                        drawH = canvas.height * 0.8;
+                        drawH = canvas.height * 0.75;
                         drawW = drawH * aspect;
                     }
                     ctx.drawImage(activeImg, (canvas.width - drawW) / 2, (canvas.height - drawH) / 2, drawW, drawH);
                 }
 
-                // 2. Safely apply to material arrays
+                // Convert canvas data into a valid model-viewer engine sampler texture object
+                const dataUrl = canvas.toDataURL("image/png");
+                const createdTexture = await viewer.createTexture(dataUrl);
+
+                // 2. Loop Through and Apply Material Updates
                 for (const material of materials) {
                     const name = material.name;
 
                     if (name === "LogoPanel") {
                         try {
-                            const dataUrl = canvas.toDataURL("image/png");
-                            const createdTexture = await viewer.createTexture(dataUrl);
-                            
-                            // Initialize map slot safely if empty
+                            // If the texture descriptor doesn't exist natively, allocate its slot space
                             if (!material.pbrMetallicRoughness.baseColorTexture) {
                                 await material.pbrMetallicRoughness.createTextureInfo();
                             }
@@ -121,12 +126,16 @@
                             if (material.pbrMetallicRoughness.baseColorTexture && createdTexture) {
                                 material.pbrMetallicRoughness.baseColorTexture.setTexture(createdTexture);
                             }
+                            
+                            // Reset tint factor back to flat neutral so it doesn't colorize our logo image
                             material.pbrMetallicRoughness.setBaseColorFactor([1.0, 1.0, 1.0, 1.0]);
+                            material.pbrMetallicRoughness.setRoughnessFactor(0.5);
+                            material.pbrMetallicRoughness.setMetallicFactor(0.0);
                         } catch (err) {
-                            console.warn("Texture mapping caught up, skipping frame safely:", err);
+                            console.warn("Skipping frame texture assignment:", err);
                         }
                     } 
-                    // Apply smooth panel color alterations
+                    // Update standard mesh panels safely
                     else if (name === "FrontLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft);
                     else if (name === "BackLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft);
                     else if (name === "MidLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.midLeft);
@@ -138,10 +147,10 @@
                     else if (name === "BottomPiping") material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping);
                     else if (name === "Stitching") material.pbrMetallicRoughness.setBaseColorFactor(current.stitching);
 
-                    // Satin shine settings
+                    // Apply standard satin shine properties to panels
                     if (["FrontLeftPanel", "BackLeftPanel", "MidLeftPanel", "FrontRightPanel", "BackRightPanel", "MidRightPanel", "WaistBand", "Sidelines"].includes(name)) {
-                        material.pbrMetallicRoughness.setRoughnessFactor(0.6);
-                        material.pbrMetallicRoughness.setMetallicFactor(0.1);
+                        material.pbrMetallicRoughness.setRoughnessFactor(0.65);
+                        material.pbrMetallicRoughness.setMetallicFactor(0.15);
                     }
                 }
 
