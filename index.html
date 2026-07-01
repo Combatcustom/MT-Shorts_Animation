@@ -20,6 +20,7 @@
         model-viewer {
             width: 95vw;
             height: 95vh;
+            /* Balanced centering placement */
             transform: translateY(2%);
             --poster-color: transparent;
         }
@@ -45,8 +46,8 @@
         environment-image="neutral"
         exposure="1.2"
         shadow-intensity="1"
-        camera-orbit="0deg 86deg auto"
-        camera-target="0m 0.28m 0m">
+        camera-orbit="0deg 84deg 2.1m"
+        camera-target="0m 0.22m 0m">
     </model-viewer>
 
     <div class="controls-hint">CombatCustom Customizer Showcase</div>
@@ -152,7 +153,7 @@
         function startColorLoop() {
             const materials = viewer.model.materials;
 
-            // Configure Material Engine settings safely without side-splitting functions
+            // Configure Material Engine settings
             materials.forEach(material => {
                 if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand"].includes(material.name)) {
                     material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
