@@ -9,7 +9,8 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
+            /* 💡 Studio lighting background backup built directly into CSS */
+            background: radial-gradient(circle at center, #3a3a3a 0%, #111111 80%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -42,8 +43,7 @@
         auto-rotate 
         rotation-per-second="35deg"
         interaction-prompt="none"
-        environment-image="basement_boxing_ring_2k.exr"
-        skybox-image="basement_boxing_ring_2k.exr"
+        environment-image="neutral"
         exposure="1.2"
         shadow-intensity="1">
     </model-viewer>
