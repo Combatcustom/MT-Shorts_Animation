@@ -37,11 +37,11 @@
         shadow-intensity="1">
     </model-viewer>
 
-    <canvas id="pipelineCanvas" width="1024" height="1024" style="display:none;"></canvas>
+    <canvas id="textureCanvas" width="1024" height="1024" style="display:none;"></canvas>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
-        const canvas = document.getElementById("pipelineCanvas");
+        const canvas = document.getElementById("textureCanvas");
         const ctx = canvas.getContext("2d");
 
         function safeColor(hexStr) {
@@ -70,6 +70,7 @@
 
         let comboIndex = 0;
 
+        // Image preloader helper
         function loadImage(src) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -80,56 +81,52 @@
             });
         }
 
-        async function runEngineOverrideLoop() {
-            // Find the underlying Three.js scene object properties inside model-viewer
-            const modelScene = viewer[Symbol.for('html-properties')].source.value ? viewer : viewer; 
-            
+        async function startConfiguratorLoop() {
+            const materials = viewer.model.materials;
+
             setInterval(async () => {
                 const current = designCombos[comboIndex];
                 const activeImg = await loadImage(current.logo);
 
-                // 1. Core Canvas Compositing
+                // 1. Build composite image layout canvas texture
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = current.hexBg;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 if (activeImg) {
                     const aspect = activeImg.width / activeImg.height;
-                    let drawW = canvas.width * 0.75;
+                    let drawW = canvas.width * 0.8;
                     let drawH = drawW / aspect;
                     if (drawH > canvas.height) {
-                        drawH = canvas.height * 0.75;
+                        drawH = canvas.height * 0.8;
                         drawW = drawH * aspect;
                     }
                     ctx.drawImage(activeImg, (canvas.width - drawW) / 2, (canvas.height - drawH) / 2, drawW, drawH);
                 }
 
-                // Convert canvas composition into web texture data
-                const urlData = canvas.toDataURL("image/png");
-                const targetTexture = await viewer.createTexture(urlData);
-
-                // 2. Deep Engine Target Injection
-                // Directly searches the raw mesh tree, targeting objects with missing texture maps
-                viewer.model.materials.forEach(material => {
+                // 2. Safely apply to material arrays
+                for (const material of materials) {
                     const name = material.name;
 
                     if (name === "LogoPanel") {
-                        // Force-instantiate ThreeJS texture map options down on the lower runtime tier
-                        const threeMaterial = material[Object.getOwnPropertySymbols(material)[0]];
-                        
-                        if (threeMaterial) {
-                            // Link texture straight into the raw WebGL rendering slot
-                            material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
+                        try {
+                            const dataUrl = canvas.toDataURL("image/png");
+                            const createdTexture = await viewer.createTexture(dataUrl);
                             
+                            // Initialize map slot safely if empty
                             if (!material.pbrMetallicRoughness.baseColorTexture) {
-                                material.pbrMetallicRoughness.createTextureInfo();
+                                await material.pbrMetallicRoughness.createTextureInfo();
                             }
-                            if (material.pbrMetallicRoughness.baseColorTexture && targetTexture) {
-                                material.pbrMetallicRoughness.baseColorTexture.setTexture(targetTexture);
+                            
+                            if (material.pbrMetallicRoughness.baseColorTexture && createdTexture) {
+                                material.pbrMetallicRoughness.baseColorTexture.setTexture(createdTexture);
                             }
+                            material.pbrMetallicRoughness.setBaseColorFactor([1.0, 1.0, 1.0, 1.0]);
+                        } catch (err) {
+                            console.warn("Texture mapping caught up, skipping frame safely:", err);
                         }
                     } 
-                    // Set color panels
+                    // Apply smooth panel color alterations
                     else if (name === "FrontLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft);
                     else if (name === "BackLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft);
                     else if (name === "MidLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.midLeft);
@@ -140,13 +137,23 @@
                     else if (name === "Sidelines") material.pbrMetallicRoughness.setBaseColorFactor(current.sidelines);
                     else if (name === "BottomPiping") material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping);
                     else if (name === "Stitching") material.pbrMetallicRoughness.setBaseColorFactor(current.stitching);
-                });
+
+                    // Satin shine settings
+                    if (["FrontLeftPanel", "BackLeftPanel", "MidLeftPanel", "FrontRightPanel", "BackRightPanel", "MidRightPanel", "WaistBand", "Sidelines"].includes(name)) {
+                        material.pbrMetallicRoughness.setRoughnessFactor(0.6);
+                        material.pbrMetallicRoughness.setMetallicFactor(0.1);
+                    }
+                }
 
                 comboIndex = (comboIndex + 1) % designCombos.length;
-            }, 1300);
+            }, 1400);
         }
 
-        viewer.addEventListener("load", runEngineOverrideLoop);
+        if (viewer.loaded) {
+            startConfiguratorLoop();
+        } else {
+            viewer.addEventListener("load", startConfiguratorLoop);
+        }
     </script>
 </body>
 </html>
