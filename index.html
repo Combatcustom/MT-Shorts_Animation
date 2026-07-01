@@ -9,8 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            /* 💡 Studio lighting background backup built directly into CSS */
-            background: radial-gradient(circle at center, #3a3a3a 0%, #111111 80%);
+            background-color: #1a1a1a;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -123,7 +122,7 @@
             {
                 frontLeft: parseColor("#c58c9c"), backLeft: parseColor("#c58c9c"), midLeft: parseColor("#5f5f80"),
                 frontRight: parseColor("#c58c9c"), backRight: parseColor("#c58c9c"), midRight: parseColor("#5f5f80"),
-                waistband: parseColor("#5f5f80"), sidelines: parseColor("#b6b6b6"), logoPanel: parseColor("#b6b6b6"),
+                waistband: parseColor("#5f504f"), sidelines: parseColor("#b6b6b6"), logoPanel: parseColor("#b6b6b6"),
                 bottomPiping: parseColor("#b6b6b6"), stitching: parseColor("white")
             },
             {
@@ -139,6 +138,7 @@
         function startColorLoop() {
             const materials = viewer.model.materials;
 
+            // 🧪 Configure Material Engine settings
             materials.forEach(material => {
                 if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand"].includes(material.name)) {
                     material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
@@ -149,6 +149,12 @@
                     material.pbrMetallicRoughness.setMetallicFactor(0.0);   
                 }
             });
+
+            // Apply a dynamic CSS backdrop blur injection directly behind the scene
+            const scene = viewer.shadowRoot.querySelector('.canvas-container');
+            if (scene) {
+                scene.style.background = "radial-gradient(circle at center, rgba(50,50,50,0.85) 0%, rgba(15,15,15,0.98) 85%)";
+            }
 
             setInterval(() => {
                 const current = designCombos[comboIndex];
