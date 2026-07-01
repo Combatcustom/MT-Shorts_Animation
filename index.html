@@ -40,29 +40,36 @@
         auto-rotate 
         rotation-per-second="35deg"
         interaction-prompt="none"
+        environment-image="neutral"
+        exposure="1.2"
         shadow-intensity="1">
     </model-viewer>
 
-    <div class="controls-hint">CombatCustom Customizer Showcase. 10 Custom Rows Loading...</div>
+    <div class="controls-hint">CombatCustom Customizer Showcase. High-Vibrancy Mode.</div>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
 
-        // 🎨 Helper function to convert Hex string or standard names to 0-1 RGBA arrays
+        // 🎨 Advanced Color Correction: Math-corrected from sRGB to true Linear color space
         function parseColor(input) {
             const clean = input.trim().toLowerCase();
             if (clean === 'white') return [0.95, 0.95, 0.95, 1.0];
-            if (clean === 'black') return [0.08, 0.08, 0.08, 1.0];
+            if (clean === 'black') return [0.03, 0.03, 0.03, 1.0]; // Richer matte black deep tone
             
-            // Hex parsing
             const hex = clean.replace('#', '');
-            const r = parseInt(hex.substring(0, 2), 16) / 255;
-            const g = parseInt(hex.substring(2, 4), 16) / 255;
-            const b = parseInt(hex.substring(4, 6), 16) / 255;
-            return [r, g, b, 1.0];
+            const rSRGB = parseInt(hex.substring(0, 2), 16) / 255;
+            const gSRGB = parseInt(hex.substring(2, 4), 16) / 255;
+            const bSRGB = parseInt(hex.substring(4, 6), 16) / 255;
+
+            // Mathematical Gamma Power Formula (Transforms pastel colors into rich, vibrant colors)
+            const rLinear = Math.pow(rSRGB, 2.2);
+            const gLinear = Math.pow(gSRGB, 2.2);
+            const bLinear = Math.pow(bSRGB, 2.2);
+
+            return [rLinear, gLinear, bLinear, 1.0];
         }
 
-        // 👔 YOUR 10 PRECISE GOOGLE SHEET COMBINATIONS
+        // 👔 YOUR 10 GOOGLE SHEET COMBINATIONS
         const designCombos = [
             {
                 frontLeft: parseColor("#631b1b"), backLeft: parseColor("#631b1b"), midLeft: parseColor("#631b1b"),
@@ -131,7 +138,7 @@
         function startColorLoop() {
             const materials = viewer.model.materials;
 
-            // 🧵 Fabric Material Roughness Engine Setup (Satin Panels vs Cotton Trim/Sidelines)
+            // 🧵 Soft Satin Panels vs Cotton Trim/Sidelines configuration
             materials.forEach(material => {
                 if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand"].includes(material.name)) {
                     material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
