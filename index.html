@@ -128,4 +128,56 @@
             },
             {
                 frontLeft: parseColor("#0a0030"), backLeft: parseColor("#0a0030"), midLeft: parseColor("#0a0030"),
-                frontRight: parseColor("#0a
+                frontRight: parseColor("#0a0030"), backRight: parseColor("#0a0030"), midRight: parseColor("#0a0030"),
+                waistband: parseColor("#5f504f"), sidelines: parseColor("#5f504f"), logoPanel: parseColor("black"),
+                bottomPiping: parseColor("white"), stitching: parseColor("black")
+            }
+        ];
+
+        let comboIndex = 0;
+
+        function startColorLoop() {
+            const materials = viewer.model.materials;
+
+            materials.forEach(material => {
+                if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
+                    material.pbrMetallicRoughness.setMetallicFactor(0.15); 
+                }
+                if (["BottomPiping", "Sidelines"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(1.0);  
+                    material.pbrMetallicRoughness.setMetallicFactor(0.0);   
+                }
+            });
+
+            setInterval(() => {
+                const current = designCombos[comboIndex];
+
+                materials.forEach(material => {
+                    switch (material.name) {
+                        case "FrontLeftPanel":  material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft); break;
+                        case "BackLeftPanel":   material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft); break;
+                        case "MidLeftPanel":    material.pbrMetallicRoughness.setBaseColorFactor(current.midLeft); break;
+                        case "FrontRightPanel": material.pbrMetallicRoughness.setBaseColorFactor(current.frontRight); break;
+                        case "BackRightPanel":  material.pbrMetallicRoughness.setBaseColorFactor(current.backRight); break;
+                        case "MidRightPanel":   material.pbrMetallicRoughness.setBaseColorFactor(current.midRight); break;
+                        case "WaistBand":       material.pbrMetallicRoughness.setBaseColorFactor(current.waistband); break;
+                        case "Sidelines":       material.pbrMetallicRoughness.setBaseColorFactor(current.sidelines); break;
+                        case "LogoPanel":       material.pbrMetallicRoughness.setBaseColorFactor(current.logoPanel); break;
+                        case "BottomPiping":    material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping); break;
+                        case "Stitching":       material.pbrMetallicRoughness.setBaseColorFactor(current.stitching); break;
+                    }
+                });
+
+                comboIndex = (comboIndex + 1) % designCombos.length;
+            }, 1200);
+        }
+
+        if (viewer.loaded) {
+            startColorLoop();
+        } else {
+            viewer.addEventListener("load", startColorLoop);
+        }
+    </script>
+</body>
+</html>
