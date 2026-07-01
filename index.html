@@ -52,79 +52,96 @@
     <script>
         const viewer = document.querySelector("#shortsViewer");
 
-        // 12 COLOR COMBINATIONS USING NATIVE, RELIABLE HEX STRINGS
+        // Safe Hex-to-RGB array converter for 3D engine
+        function safeColor(hexStr) {
+            const clean = hexStr.trim().toLowerCase();
+            if (clean === 'white') return [0.95, 0.95, 0.95, 1.0];
+            if (clean === 'black') return [0.03, 0.03, 0.03, 1.0];
+            
+            const hex = clean.replace('#', '');
+            if (hex.length !== 6) return [1.0, 1.0, 1.0, 1.0]; // Fallback to white if broken
+            
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+            // Convert sRGB to Linear space for WebGL rendering
+            return [Math.pow(r, 2.2), Math.pow(g, 2.2), Math.pow(b, 2.2), 1.0];
+        }
+
+        // ALL 12 COLOR COMBINATIONS FROM YOUR DESIGN SHEET
         const designCombos = [
             {
-                frontLeft: "#631b1b", backLeft: "#631b1b", midLeft: "#631b1b",
-                frontRight: "#631b1b", backRight: "#631b1b", midRight: "#631b1b",
-                waistband: "#250000", sidelines: "#ffffff", logoPanel: "#ffffff",
-                bottomPiping: "#ffffff", stitching: "#ffffff", useWhiteLogo: false
+                frontLeft: safeColor("#631b1b"), backLeft: safeColor("#631b1b"), midLeft: safeColor("#631b1b"),
+                frontRight: safeColor("#631b1b"), backRight: safeColor("#631b1b"), midRight: safeColor("#631b1b"),
+                waistband: safeColor("#250000"), sidelines: safeColor("white"), logoPanel: safeColor("white"),
+                bottomPiping: safeColor("white"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
-                frontLeft: "#ffbf00", backLeft: "#ffbf00", midLeft: "#ffbf00",
-                frontRight: "#353535", backRight: "#353535", midRight: "#353535",
-                waistband: "#4b4b4b", sidelines: "#4b4b4b", logoPanel: "#4b4b4b",
-                bottomPiping: "#ffffff", stitching: "#000000", useWhiteLogo: true
+                frontLeft: safeColor("#ffbf00"), backLeft: safeColor("#ffbf00"), midLeft: safeColor("#ffbf00"),
+                frontRight: safeColor("#353535"), backRight: safeColor("#353535"), midRight: safeColor("#353535"),
+                waistband: safeColor("#4b4b4b"), sidelines: safeColor("#4b4b4b"), logoPanel: safeColor("#4b4b4b"),
+                bottomPiping: safeColor("white"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
-                frontLeft: "#c3ccec", backLeft: "#c3ccec", midLeft: "#412727",
-                frontRight: "#c3ccec", backRight: "#c3ccec", midRight: "#412727",
-                waistband: "#412727", sidelines: "#303030", logoPanel: "#303030",
-                bottomPiping: "#c3ccec", stitching: "#000000", useWhiteLogo: true
+                frontLeft: safeColor("#c3ccec"), backLeft: safeColor("#c3ccec"), midLeft: safeColor("#412727"),
+                frontRight: safeColor("#c3ccec"), backRight: safeColor("#c3ccec"), midRight: safeColor("#412727"),
+                waistband: safeColor("#412727"), sidelines: safeColor("#303030"), logoPanel: safeColor("#303030"),
+                bottomPiping: safeColor("#c3ccec"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
-                frontLeft: "#789678", backLeft: "#789678", midLeft: "#789678",
-                frontRight: "#789678", backRight: "#789678", midRight: "#789678",
-                waistband: "#4b4b4b", sidelines: "#4b4b4b", logoPanel: "#4b4b4b",
-                bottomPiping: "#789678", stitching: "#000000", useWhiteLogo: true
+                frontLeft: safeColor("#789678"), backLeft: safeColor("#789678"), midLeft: safeColor("#789678"),
+                frontRight: safeColor("#789678"), backRight: safeColor("#789678"), midRight: safeColor("#789678"),
+                waistband: safeColor("#4b4b4b"), sidelines: safeColor("#4b4b4b"), logoPanel: safeColor("#4b4b4b"),
+                bottomPiping: safeColor("#789678"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
-                frontLeft: "#331800", backLeft: "#331800", midLeft: "#331800",
-                frontRight: "#9898ac", backRight: "#9898ac", midRight: "#9898ac",
-                waistband: "#9898ac", sidelines: "#cecece", logoPanel: "#cecece",
-                bottomPiping: "#9898ac", stitching: "#000000", useWhiteLogo: false
+                frontLeft: safeColor("#331800"), backLeft: safeColor("#331800"), midLeft: safeColor("#331800"),
+                frontRight: safeColor("#9898ac"), backRight: safeColor("#9898ac"), midRight: safeColor("#9898ac"),
+                waistband: safeColor("#9898ac"), sidelines: safeColor("#cecece"), logoPanel: safeColor("#cecece"),
+                bottomPiping: safeColor("#9898ac"), stitching: safeColor("black"), useWhiteLogo: false
             },
             {
-                frontLeft: "#020101", backLeft: "#020101", midLeft: "#202044",
-                frontRight: "#020101", backRight: "#020101", midRight: "#202044",
-                waistband: "#020101", sidelines: "#020101", logoPanel: "#9b9b9b",
-                bottomPiping: "#9b9b9b", stitching: "#ffffff", useWhiteLogo: false
+                frontLeft: safeColor("#020101"), backLeft: safeColor("#020101"), midLeft: safeColor("#202044"),
+                frontRight: safeColor("#020101"), backRight: safeColor("#020101"), midRight: safeColor("#202044"),
+                waistband: safeColor("#020101"), sidelines: safeColor("#020101"), logoPanel: safeColor("#9b9b9b"),
+                bottomPiping: safeColor("#9b9b9b"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
-                frontLeft: "#b9a973", backLeft: "#b9a973", midLeft: "#b9a973",
-                frontRight: "#b9a973", backRight: "#b9a973", midRight: "#b9a973",
-                waistband: "#0f2c0f", sidelines: "#0f2c0f", logoPanel: "#9b9b9b",
-                bottomPiping: "#9b9b9b", stitching: "#000000", useWhiteLogo: false
+                frontLeft: safeColor("#b9a973"), backLeft: safeColor("#b9a973"), midLeft: safeColor("#b9a973"),
+                frontRight: safeColor("#b9a973"), backRight: safeColor("#b9a973"), midRight: safeColor("#b9a973"),
+                waistband: safeColor("#0f2c0f"), sidelines: safeColor("#0f2c0f"), logoPanel: safeColor("#9b9b9b"),
+                bottomPiping: safeColor("#9b9b9b"), stitching: safeColor("black"), useWhiteLogo: false
             },
             {
-                frontLeft: "#446970", backLeft: "#446970", midLeft: "#446970",
-                frontRight: "#bebebe", backRight: "#bebebe", midRight: "#bebebe",
-                waistband: "#bebebe", sidelines: "#1c2513", logoPanel: "#1c2513",
-                bottomPiping: "#000000", stitching: "#ffffff", useWhiteLogo: true
+                frontLeft: safeColor("#446970"), backLeft: safeColor("#446970"), midLeft: safeColor("#446970"),
+                frontRight: safeColor("#bebebe"), backRight: safeColor("#bebebe"), midRight: safeColor("#bebebe"),
+                waistband: safeColor("#bebebe"), sidelines: safeColor("#1c2513"), logoPanel: safeColor("#1c2513"),
+                bottomPiping: safeColor("black"), stitching: safeColor("white"), useWhiteLogo: true
             },
             {
-                frontLeft: "#c58c9c", backLeft: "#c58c9c", midLeft: "#5f5f80",
-                frontRight: "#c58c9c", backRight: "#c58c9c", midRight: "#5f5f80",
-                waistband: "#5f504f", sidelines: "#b6b6b6", logoPanel: "#b6b6b6",
-                bottomPiping: "#b6b6b6", stitching: "#ffffff", useWhiteLogo: false
+                frontLeft: safeColor("#c58c9c"), backLeft: safeColor("#c58c9c"), midLeft: safeColor("#5f5f80"),
+                frontRight: safeColor("#c58c9c"), backRight: safeColor("#c58c9c"), midRight: safeColor("#5f5f80"),
+                waistband: safeColor("#5f504f"), sidelines: safeColor("#b6b6b6"), logoPanel: safeColor("#b6b6b6"),
+                bottomPiping: safeColor("#b6b6b6"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
-                frontLeft: "#0a0030", backLeft: "#0a0030", midLeft: "#0a0030",
-                frontRight: "#0a0030", backRight: "#0a0030", midRight: "#0a0030",
-                waistband: "#5f504f", sidelines: "#5f504f", logoPanel: "#000000",
-                bottomPiping: "#ffffff", stitching: "#000000", useWhiteLogo: true
+                frontLeft: safeColor("#0a0030"), backLeft: safeColor("#0a0030"), midLeft: safeColor("#0a0030"),
+                frontRight: safeColor("#0a0030"), backRight: safeColor("#0a0030"), midRight: safeColor("#0a0030"),
+                waistband: safeColor("#5f504f"), sidelines: safeColor("#5f504f"), logoPanel: safeColor("black"),
+                bottomPiping: safeColor("white"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
-                frontLeft: "#2e4b2e", backLeft: "#2e4b2e", midLeft: "#2e4b2e",
-                frontRight: "#aa0000", backRight: "#aa0000", midRight: "#aa0000",
-                waistband: "#ffffff", sidelines: "#ffffff", logoPanel: "#2f2d38",
-                bottomPiping: "#ffffff", stitching: "#ffffff", useWhiteLogo: true
+                frontLeft: safeColor("#2e4b2e"), backLeft: safeColor("#2e4b2e"), midLeft: safeColor("#2e4b2e"),
+                frontRight: safeColor("#aa0000"), backRight: safeColor("#aa0000"), midRight: safeColor("#aa0000"),
+                waistband: safeColor("white"), sidelines: safeColor("white"), logoPanel: safeColor("#2f2d38"),
+                bottomPiping: safeColor("white"), stitching: safeColor("white"), useWhiteLogo: true
             },
             {
-                frontLeft: "#ff7633", backLeft: "#ff7633", midLeft: "#9898ac",
-                frontRight: "#ff7633", backRight: "#ff7633", midRight: "#9898ac",
-                waistband: "#9898ac", sidelines: "#301c1c", logoPanel: "#301c1c",
-                bottomPiping: "#ffffff", stitching: "#000000", useWhiteLogo: true
+                frontLeft: safeColor("#ff7633"), backLeft: safeColor("#ff7633"), midLeft: safeColor("#9898ac"),
+                frontRight: safeColor("#ff7633"), backRight: safeColor("#ff7633"), midRight: safeColor("#9898ac"),
+                waistband: safeColor("#9898ac"), sidelines: safeColor("#301c1c"), logoPanel: safeColor("#301c1c"),
+                bottomPiping: safeColor("white"), stitching: safeColor("black"), useWhiteLogo: true
             }
         ];
 
@@ -133,29 +150,31 @@
         async function startColorAndBrandLoop() {
             const materials = viewer.model.materials;
             
-            // Log material names to browser console for verification
-            console.log("GLB Materials Found:", materials.map(m => m.name));
+            // This displays your actual GLB mesh names directly in the console!
+            console.log("📋 EXACT MATERIAL NAMES FOUND IN YOUR GLB FILE:", materials.map(m => m.name));
 
-            // Pre-load textures using exact original filenames
+            // Load textures inside separate try/catch blocks so one error won't break everything
             let texKickerBlack, texKickerWhite, texTextBlack, texTextWhite;
-            try {
-                texKickerBlack = await viewer.createTexture("Combat Custom_Kicker Logo_Black Clear BG.png");
-                texKickerWhite = await viewer.createTexture("Combat Custom_Kicker Logo_White Clear BG.png");
-                texTextBlack   = await viewer.createTexture("CC_Main Logo_BLACK_V2.png");
-                texTextWhite   = await viewer.createTexture("CC_Main Logo_WHITE_V2.png");
-                console.log("🎯 All original logo assets loaded successfully.");
-            } catch (err) {
-                console.error("❌ Texture Load Error: Check paths or server connection.", err);
-            }
+            
+            try { texKickerBlack = await viewer.createTexture("Combat Custom_Kicker Logo_Black Clear BG.png"); } 
+            catch(e) { console.warn("Missing Image: Kicker Black"); }
+            
+            try { texKickerWhite = await viewer.createTexture("Combat Custom_Kicker Logo_White Clear BG.png"); } 
+            catch(e) { console.warn("Missing Image: Kicker White"); }
+            
+            try { texTextBlack = await viewer.createTexture("CC_Main Logo_BLACK_V2.png"); } 
+            catch(e) { console.warn("Missing Image: Main Logo Black"); }
+            
+            try { texTextWhite = await viewer.createTexture("CC_Main Logo_WHITE_V2.png"); } 
+            catch(e) { console.warn("Missing Image: Main Logo White"); }
 
             setInterval(() => {
                 const current = designCombos[comboIndex];
 
-                // 1. Flexible Keyword Scanner for Colors and Texture Profiles
+                // 1. Color Application Logic
                 materials.forEach(material => {
                     const name = material.name.toLowerCase();
 
-                    // Apply color based on string keywords instead of rigid exact names
                     if (name.includes("frontleft")) material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft);
                     else if (name.includes("backleft")) material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft);
                     else if (name.includes("midleft")) material.pbrMetallicRoughness.setBaseColorFactor(current.midLeft);
@@ -168,10 +187,48 @@
                     else if (name.includes("bottompiping") || name.includes("piping")) material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping);
                     else if (name.includes("stitching") || name.includes("stitch")) material.pbrMetallicRoughness.setBaseColorFactor(current.stitching);
 
-                    // Lock panels AND sidelines into the premium satin fabric finish
+                    // Set Premium Satin finish profile to panels AND sidelines
                     if (name.includes("panel") || name.includes("waist") || name.includes("sideline") || name.includes("logo") || name.includes("patch")) {
                         material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
                         material.pbrMetallicRoughness.setMetallicFactor(0.15); 
                     }
-                    // Keep piping flat/matte
-                    if (name.includes("piping
+                    if (name.includes("piping")) {
+                        material.pbrMetallicRoughness.setRoughnessFactor(1.0);  
+                        material.pbrMetallicRoughness.setMetallicFactor(0.0);   
+                    }
+                });
+
+                // 2. Safely Swap Brand Textures without throwing crashes
+                const isEven = (comboIndex % 2 === 0);
+                let activeTex = null;
+
+                if (isEven) {
+                    activeTex = current.useWhiteLogo ? texKickerWhite : texKickerBlack;
+                } else {
+                    activeTex = current.useWhiteLogo ? texTextWhite : texTextBlack;
+                }
+
+                // Apply image map to any layer matching our branding terms
+                if (activeTex) {
+                    materials.forEach(material => {
+                        const name = material.name.toLowerCase();
+                        if (name.includes("logo") || name.includes("patch") || name.includes("label") || name.includes("brand")) {
+                            if (material.pbrMetallicRoughness.baseColorTexture) {
+                                material.pbrMetallicRoughness.baseColorTexture.setTexture(activeTex);
+                            }
+                        }
+                    });
+                }
+
+                comboIndex = (comboIndex + 1) % designCombos.length;
+            }, 1200);
+        }
+
+        if (viewer.loaded) {
+            startColorAndBrandLoop();
+        } else {
+            viewer.addEventListener("load", startColorAndBrandLoop);
+        }
+    </script>
+</body>
+</html>
