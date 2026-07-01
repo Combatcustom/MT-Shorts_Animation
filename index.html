@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        /* Container to stack the viewer and logo perfectly */
+        /* Clean, centered 3D frame wrapper */
         .viewer-container {
             position: relative;
             width: 100%;
@@ -33,18 +33,6 @@
         model-viewer {
             width: 100%;
             height: 100%;
-        }
-
-        /* The Logo Overlay Sticker placed precisely over the waistband patch */
-        .logo-overlay {
-            position: absolute;
-            top: 29.5%; /* Centers it vertically on the patch */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 32px; /* Adjusted size to fit the waistband panel neatly */
-            height: auto;
-            pointer-events: none; /* Keeps it completely non-interactive */
-            z-index: 10;
         }
 
         .controls {
@@ -62,52 +50,66 @@
             src="MT SHORTS.glb" 
             alt="3D Custom Combat Shorts" 
             auto-rotate
-            rotation-per-second="30deg"
+            rotation-per-second="40deg"
             shadow-intensity="1">
         </model-viewer>
-        
-        <img id="custom-logo" class="logo-overlay" src="logo-kicker-black.png" alt="Logo Layer">
     </div>
 
     <div class="controls">
-        <h3>Customizer Loop Active</h3>
-        <p>Swapping all fabric panels and logos every 1.4 seconds.</p>
+        <h3>True 3D Texture Binding Active</h3>
+        <p>Logos are mapped natively onto the spinning waistband patch.</p>
     </div>
 
     <script>
         const viewer = document.getElementById('shorts-viewer');
-        const logoImg = document.getElementById('custom-logo');
 
-        // Combined asset loop layout configuration
+        // Clean Red/Black and Blue/White color-space decimals
         const designCycle = [
-            { color: [0.8, 0.1, 0.1, 1.0], logo: 'logo-kicker-black.png' }, // Red shorts / Black Logo
-            { color: [0.1, 0.1, 0.8, 1.0], logo: 'logo-kicker-white.png' }  // Blue shorts / White Logo
+            { color: [0.8, 0.05, 0.05, 1.0], logo: 'logo-kicker-black.png' }, // Red Fabric / Black Logo
+            { color: [0.05, 0.05, 0.8, 1.0], logo: 'logo-kicker-white.png' }  // Blue Fabric / White Logo
         ];
 
         let currentIndex = 0;
 
-        function runCustomizerLoop() {
+        async function runCustomizerLoop() {
             if (!viewer.model || !viewer.model.materials) return;
 
             const currentDesign = designCycle[currentIndex];
 
-            // 1. Loop through ALL materials on the file so the whole short shifts color
+            // 1. Loop through all fabric pieces to apply base colors
             viewer.model.materials.forEach(material => {
-                // Skip the waistband logo panel so it stays white/neutral background
                 if (material.name !== 'LogoPanel' && material.pbrMetallicRoughness) {
                     material.pbrMetallicRoughness.setBaseColorFactor(currentDesign.color);
                 }
             });
 
-            // 2. Swap the logo layer source
-            logoImg.src = currentDesign.logo;
+            // 2. Map the logo image directly onto the 3D waistband patch mesh
+            const logoMaterial = viewer.model.materials.find(m => m.name === 'LogoPanel');
+            if (logoMaterial && logoMaterial.pbrMetallicRoughness) {
+                try {
+                    // Force-create a true WebGL texture tracking map from your image files
+                    const texture = await viewer.createTexture(currentDesign.logo);
+                    
+                    // Inject it natively into the material's color slot
+                    if (logoMaterial.pbrMetallicRoughness.baseColorTexture) {
+                        logoMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+                    } else {
+                        // If slot is uninitialized, bind it dynamically directly to the color channel
+                        logoMaterial.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]); 
+                        logoMaterial.pbrMetallicRoughness.baseColorTexture = { setTexture: (t) => logoMaterial.pbrMetallicRoughness.baseColorTexture = t };
+                        logoMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+                    }
+                } catch (err) {
+                    console.error("3D Canvas binding failed for image source:", currentDesign.logo, err);
+                }
+            }
 
             currentIndex = (currentIndex + 1) % designCycle.length;
         }
 
-        // Initialize once model data passes validation
+        // Run the sequence immediately when the 3D scene finishes loading
         viewer.addEventListener('load', () => {
-            console.log("3D engine ready. Global panel sync active.");
+            console.log("3D Engine Ready. Running true material swaps...");
             setInterval(runCustomizerLoop, 1400);
         });
     </script>
