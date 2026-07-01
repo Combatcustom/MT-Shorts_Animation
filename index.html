@@ -43,75 +43,86 @@
         shadow-intensity="1">
     </model-viewer>
 
-    <div class="controls-hint">Premium Customizer Showcase. Satin Fabric Finish.</div>
+    <div class="controls-hint">CombatCustom Customizer Showcase. 10 Custom Rows Loading...</div>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
 
-        // 🎨 Premium Combat Color Palette (RGBA format from 0.0 to 1.0)
-        const BLACK        = [0.08, 0.08, 0.08, 1.0];
-        const CHARCOAL     = [0.22, 0.22, 0.22, 1.0];
-        const WHITE        = [0.95, 0.95, 0.95, 1.0];
-        const GOLD         = [0.85, 0.65, 0.13, 1.0];
-        const CRIMSON      = [0.75, 0.02, 0.02, 1.0];
-        const NAVY         = [0.02, 0.12, 0.35, 1.0];
-        const MILITARY_OD  = [0.22, 0.28, 0.18, 1.0];
-        const PURPLE       = [0.25, 0.05, 0.45, 1.0];
-        const TROPIC_TEAL  = [0.0, 0.55, 0.55, 1.0];
-        const ELECTRIC_ORANGE = [0.95, 0.35, 0.0, 1.0];
-        const NEON_YELLOW  = [0.85, 0.95, 0.0, 1.0];
+        // 🎨 Helper function to convert Hex string or standard names to 0-1 RGBA arrays
+        function parseColor(input) {
+            const clean = input.trim().toLowerCase();
+            if (clean === 'white') return [0.95, 0.95, 0.95, 1.0];
+            if (clean === 'black') return [0.08, 0.08, 0.08, 1.0];
+            
+            // Hex parsing
+            const hex = clean.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+            return [r, g, b, 1.0];
+        }
 
-        // 👔 10 DISTINCT HIGH-VARIETY DESIGN COMBOS
+        // 👔 YOUR 10 PRECISE GOOGLE SHEET COMBINATIONS
         const designCombos = [
             {
-                name: "1. Onyx Gold",
-                leftPanels: BLACK, rightPanels: BLACK, midLeft: BLACK, midRight: BLACK,
-                waistband: GOLD, trim: GOLD, logo: BLACK, stitching: GOLD
+                frontLeft: parseColor("#631b1b"), backLeft: parseColor("#631b1b"), midLeft: parseColor("#631b1b"),
+                frontRight: parseColor("#631b1b"), backRight: parseColor("#631b1b"), midRight: parseColor("#631b1b"),
+                waistband: parseColor("#250000"), sidelines: parseColor("White"), logoPanel: parseColor("White"),
+                bottomPiping: parseColor("white"), stitching: parseColor("White")
             },
             {
-                name: "2. Crimson split Onyx",
-                leftPanels: CRIMSON, rightPanels: BLACK, midLeft: CRIMSON, midRight: BLACK,
-                waistband: CHARCOAL, trim: GOLD, logo: WHITE, stitching: CRIMSON
+                frontLeft: parseColor("#ffbf00"), backLeft: parseColor("#ffbf00"), midLeft: parseColor("#ffbf00"),
+                frontRight: parseColor("#353535"), backRight: parseColor("#353535"), midRight: parseColor("#353535"),
+                waistband: parseColor("#4b4b4b"), sidelines: parseColor("#4b4b4b"), logoPanel: parseColor("#4b4b4b"),
+                bottomPiping: parseColor("White"), stitching: parseColor("black")
             },
             {
-                name: "3. Spec-Ops Olive",
-                leftPanels: MILITARY_OD, rightPanels: MILITARY_OD, midLeft: MILITARY_OD, midRight: MILITARY_OD,
-                waistband: BLACK, trim: CHARCOAL, logo: BLACK, stitching: WHITE
+                frontLeft: parseColor("#c3ccec"), backLeft: parseColor("#c3ccec"), midLeft: parseColor("#412727"),
+                frontRight: parseColor("#c3ccec"), backRight: parseColor("#c3ccec"), midRight: parseColor("#412727"),
+                waistband: parseColor("#412727"), sidelines: parseColor("#303030"), logoPanel: parseColor("#303030"),
+                bottomPiping: parseColor("#c3ccec"), stitching: parseColor("black")
             },
             {
-                name: "4. Cyberpunk Split",
-                leftPanels: CHARCOAL, rightPanels: PURPLE, midLeft: CHARCOAL, midRight: PURPLE,
-                waistband: BLACK, trim: NEON_YELLOW, logo: NEON_YELLOW, stitching: PURPLE
+                frontLeft: parseColor("#789678"), backLeft: parseColor("#789678"), midLeft: parseColor("#789678"),
+                frontRight: parseColor("#789678"), backRight: parseColor("#789678"), midRight: parseColor("#789678"),
+                waistband: parseColor("#4b4b4b"), sidelines: parseColor("#4b4b4b"), logoPanel: parseColor("#4b4b4b"),
+                bottomPiping: parseColor("#789678"), stitching: parseColor("black")
             },
             {
-                name: "5. Royal Anchor",
-                leftPanels: NAVY, rightPanels: NAVY, midLeft: NAVY, midRight: NAVY,
-                waistband: GOLD, trim: WHITE, logo: NAVY, stitching: GOLD
+                frontLeft: parseColor("#331800"), backLeft: parseColor("#331800"), midLeft: parseColor("#331800"),
+                frontRight: parseColor("#9898ac"), backRight: parseColor("#9898ac"), midRight: parseColor("#9898ac"),
+                waistband: parseColor("#9898ac"), sidelines: parseColor("#cecece"), logoPanel: parseColor("#cecece"),
+                bottomPiping: parseColor("#9898ac"), stitching: parseColor("black")
             },
             {
-                name: "6. Sunset Eclipse Split",
-                leftPanels: BLACK, rightPanels: ELECTRIC_ORANGE, midLeft: BLACK, midRight: ELECTRIC_ORANGE,
-                waistband: CHARCOAL, trim: BLACK, logo: WHITE, stitching: ELECTRIC_ORANGE
+                frontLeft: parseColor("#020101"), backLeft: parseColor("#020101"), midLeft: parseColor("#202044"),
+                frontRight: parseColor("#020101"), backRight: parseColor("#020101"), midRight: parseColor("#202044"),
+                waistband: parseColor("#020101"), sidelines: parseColor("#020101"), logoPanel: parseColor("#9b9b9b"),
+                bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("white")
             },
             {
-                name: "7. Pharaoh Purple",
-                leftPanels: PURPLE, rightPanels: PURPLE, midLeft: PURPLE, midRight: PURPLE,
-                waistband: GOLD, trim: GOLD, logo: BLACK, stitching: WHITE
+                frontLeft: parseColor("#b9a973"), backLeft: parseColor("#b9a973"), midLeft: parseColor("#b9a973"),
+                frontRight: parseColor("#b9a973"), backRight: parseColor("#b9a973"), midRight: parseColor("#b9a973"),
+                waistband: parseColor("#0f2c0f"), sidelines: parseColor("#0f2c0f"), logoPanel: parseColor("#9b9b9b"),
+                bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("Black")
             },
             {
-                name: "8. Glacier Frost Split",
-                leftPanels: WHITE, rightPanels: NAVY, midLeft: WHITE, midRight: NAVY,
-                waistband: BLACK, trim: CRIMSON, logo: WHITE, stitching: NAVY
+                frontLeft: parseColor("#446970"), backLeft: parseColor("#446970"), midLeft: parseColor("#446970"),
+                frontRight: parseColor("#bebebe"), backRight: parseColor("#bebebe"), midRight: parseColor("#bebebe"),
+                waistband: parseColor("#bebebe"), sidelines: parseColor("#1c2513"), logoPanel: parseColor("#1c2513"),
+                bottomPiping: parseColor("black"), stitching: parseColor("white")
             },
             {
-                name: "9. Miami Coral",
-                leftPanels: TROPIC_TEAL, rightPanels: TROPIC_TEAL, midLeft: TROPIC_TEAL, midRight: TROPIC_TEAL,
-                waistband: BLACK, trim: ELECTRIC_ORANGE, logo: WHITE, stitching: TROPIC_TEAL
+                frontLeft: parseColor("#c58c9c"), backLeft: parseColor("#c58c9c"), midLeft: parseColor("#5f5f80"),
+                frontRight: parseColor("#c58c9c"), backRight: parseColor("#c58c9c"), midRight: parseColor("#5f5f80"),
+                waistband: parseColor("#5f5f80"), sidelines: parseColor("#b6b6b6"), logoPanel: parseColor("#b6b6b6"),
+                bottomPiping: parseColor("#b6b6b6"), stitching: parseColor("white")
             },
             {
-                name: "10. Bloodsport Split",
-                leftPanels: CRIMSON, rightPanels: NAVY, midLeft: CRIMSON, midRight: NAVY,
-                waistband: GOLD, trim: WHITE, logo: CRIMSON, stitching: WHITE
+                frontLeft: parseColor("#0a0030"), backLeft: parseColor("#0a0030"), midLeft: parseColor("#0a0030"),
+                frontRight: parseColor("#0a0030"), backRight: parseColor("#0a0030"), midRight: parseColor("#0a0030"),
+                waistband: parseColor("#5f504f"), sidelines: parseColor("#5f504f"), logoPanel: parseColor("black"),
+                bottomPiping: parseColor("white"), stitching: parseColor("black")
             }
         ];
 
@@ -120,37 +131,36 @@
         function startColorLoop() {
             const materials = viewer.model.materials;
 
-            const leftSide = ["FrontLeftPanel", "BackLeftPanel"];
-            const rightSide = ["FrontRightPanel", "BackRightPanel"];
-            const midLeftPanel = ["MidLeftPanel"];
-            const midRightPanel = ["MidRightPanel"];
-            const waistbandPanels = ["WaistBand"];
-            const trimPanels = ["BottomPiping", "Sidelines"];
-            const logoPanels = ["LogoPanel"];
-            const stitchingPanels = ["Stitching"];
-
-            // 🧵 SATIN FABRIC INITIALIZER: Run once to change surface properties
+            // 🧵 Fabric Material Roughness Engine Setup (Satin Panels vs Cotton Trim/Sidelines)
             materials.forEach(material => {
-                // Apply a soft, diffused satin blur factor to the main fabric components
-                if ([...leftSide, ...rightSide, ...midLeftPanel, ...midRightPanel, ...waistbandPanels, ...trimPanels].includes(material.name)) {
-                    material.pbrMetallicRoughness.setRoughnessFactor(0.65); // Softens the reflection (destroys the leather plastic look)
-                    material.pbrMetallicRoughness.setMetallicFactor(0.15); // Adds subtle premium fabric highlight depth
+                if (["FrontLeftPanel", "BackLeftPanel", "FrontRightPanel", "BackRightPanel", "MidLeftPanel", "MidRightPanel", "WaistBand"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
+                    material.pbrMetallicRoughness.setMetallicFactor(0.15); 
+                }
+                if (["BottomPiping", "Sidelines"].includes(material.name)) {
+                    material.pbrMetallicRoughness.setRoughnessFactor(1.0);  
+                    material.pbrMetallicRoughness.setMetallicFactor(0.0);   
                 }
             });
 
-            // Color swapping interval loop
+            // Master interval system timed at 1.2 seconds per swap
             setInterval(() => {
-                const currentCombo = designCombos[comboIndex];
+                const current = designCombos[comboIndex];
 
                 materials.forEach(material => {
-                    if (leftSide.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.leftPanels);
-                    if (rightSide.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.rightPanels);
-                    if (midLeftPanel.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midLeft);
-                    if (midRightPanel.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.midRight);
-                    if (waistbandPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.waistband);
-                    if (trimPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.trim);
-                    if (logoPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.logo);
-                    if (stitchingPanels.includes(material.name)) material.pbrMetallicRoughness.setBaseColorFactor(currentCombo.stitching);
+                    switch (material.name) {
+                        case "FrontLeftPanel":  material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft); break;
+                        case "BackLeftPanel":   material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft); break;
+                        case "MidLeftPanel":    material.pbrMetallicRoughness.setBaseColorFactor(current.midLeft); break;
+                        case "FrontRightPanel": material.pbrMetallicRoughness.setBaseColorFactor(current.frontRight); break;
+                        case "BackRightPanel":  material.pbrMetallicRoughness.setBaseColorFactor(current.backRight); break;
+                        case "MidRightPanel":   material.pbrMetallicRoughness.setBaseColorFactor(current.midRight); break;
+                        case "WaistBand":       material.pbrMetallicRoughness.setBaseColorFactor(current.waistband); break;
+                        case "Sidelines":       material.pbrMetallicRoughness.setBaseColorFactor(current.sidelines); break;
+                        case "LogoPanel":       material.pbrMetallicRoughness.setBaseColorFactor(current.logoPanel); break;
+                        case "BottomPiping":    material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping); break;
+                        case "Stitching":       material.pbrMetallicRoughness.setBaseColorFactor(current.stitching); break;
+                    }
                 });
 
                 comboIndex = (comboIndex + 1) % designCombos.length;
