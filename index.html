@@ -18,14 +18,34 @@
             min-height: 100vh;
         }
 
-        /* 3D Canvas Styling */
-        model-viewer {
+        /* Container to stack the viewer and logo perfectly */
+        .viewer-container {
+            position: relative;
             width: 100%;
             max-width: 600px;
             height: 500px;
             background-color: #242424;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* The Logo Overlay Sticker placed precisely over the waistband patch */
+        .logo-overlay {
+            position: absolute;
+            top: 29.5%; /* Centers it vertically on the patch */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75px; /* Adjust size to fit the panel neatly */
+            height: auto;
+            pointer-events: none; /* Allows user to drag the 3D model through the image */
+            z-index: 10;
+            transition: opacity 0.2s ease-in-out;
         }
 
         .controls {
@@ -37,24 +57,28 @@
 </head>
 <body>
 
-    <model-viewer 
-        id="shorts-viewer" 
-        src="MTSHORTS-v1.glb" 
-        alt="3D Custom Combat Shorts" 
-        camera-controls 
-        auto-rotate
-        shadow-intensity="1">
-    </model-viewer>
+    <div class="viewer-container">
+        <model-viewer 
+            id="shorts-viewer" 
+            src="MTSHORTS-v1.glb" 
+            alt="3D Custom Combat Shorts" 
+            camera-controls
+            shadow-intensity="1">
+        </model-viewer>
+        
+        <img id="custom-logo" class="logo-overlay" src="logo-kicker-black.png" alt="Logo Layer">
+    </div>
 
     <div class="controls">
         <h3>Customizer Loop Active</h3>
-        <p>Swapping colors and logos smoothly every 1.4 seconds.</p>
+        <p>Swapping fabric colors and screen logos every 1.4 seconds.</p>
     </div>
 
     <script>
         const viewer = document.getElementById('shorts-viewer');
+        const logoImg = document.getElementById('custom-logo');
 
-        // Assets Configuration Array
+        // Combined asset loop layout configuration
         const designCycle = [
             { color: [0.8, 0.1, 0.1, 1.0], logo: 'logo-kicker-black.png' }, // Red shorts / Black Logo
             { color: [0.1, 0.1, 0.8, 1.0], logo: 'logo-kicker-white.png' }  // Blue shorts / White Logo
@@ -62,41 +86,26 @@
 
         let currentIndex = 0;
 
-        // Core Texture Swap Loop Engine
-        async function runCustomizerLoop() {
-            // Ensure 3D materials are completely loaded into browser memory
+        function runCustomizerLoop() {
             if (!viewer.model || !viewer.model.materials) return;
 
             const currentDesign = designCycle[currentIndex];
 
-            // 1. Cycle Background Fabric Base Color
+            // 1. Swap the fabric color on the 3D model panels natively
             const baseMaterial = viewer.model.materials.find(m => m.name === 'FrontLeftPanel');
             if (baseMaterial) {
                 baseMaterial.pbrMetallicRoughness.setBaseColorFactor(currentDesign.color);
             }
 
-            // 2. Cycle Custom Logo Texture Maps onto your newly fixed slot
-            const logoMaterial = viewer.model.materials.find(m => m.name === 'LogoPanel');
-            if (logoMaterial) {
-                try {
-                    // Pull texture data dynamically out of GitHub repository directories
-                    const texture = await viewer.createTexture(currentDesign.logo);
-                    
-                    if (logoMaterial.pbrMetallicRoughness && logoMaterial.pbrMetallicRoughness.baseColorTexture) {
-                        logoMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
-                    }
-                } catch (error) {
-                    console.error("Texture tracking error for file:", currentDesign.logo, error);
-                }
-            }
+            // 2. Safely swap the logo layer source on top of the 3D viewer frame
+            logoImg.src = currentDesign.logo;
 
-            // Move to next configuration block in array index loop
             currentIndex = (currentIndex + 1) % designCycle.length;
         }
 
-        // Trigger loop cycle sync sequence once model is fully parsed by renderer
+        // Initialize once model data passes validation
         viewer.addEventListener('load', () => {
-            console.log("3D Asset pipeline connected. Executing color loops...");
+            console.log("3D engine ready. Screen synchronization active.");
             setInterval(runCustomizerLoop, 1400);
         });
     </script>
