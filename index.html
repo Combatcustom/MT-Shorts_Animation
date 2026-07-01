@@ -31,6 +31,10 @@
             letter-spacing: 1px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
+        /* Hidden helper canvas for processing composite textures */
+        #textureCanvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -48,9 +52,18 @@
     </model-viewer>
 
     <div class="controls-hint">CombatCustom Customizer Showcase</div>
+    <canvas id="textureCanvas" width="1024" height="1024"></canvas>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
+        const canvas = document.getElementById("textureCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Converts hex to simple CSS color strings for Canvas painting
+        function formatHex(hexStr) {
+            const clean = hexStr.trim();
+            return clean.startsWith('#') ? clean : `#${clean}`;
+        }
 
         function safeColor(hexStr) {
             const clean = hexStr.trim().toLowerCase();
@@ -67,74 +80,87 @@
             return [Math.pow(r, 2.2), Math.pow(g, 2.2), Math.pow(b, 2.2), 1.0];
         }
 
+        // Color combos with raw strings added for canvas rendering
         const designCombos = [
             {
+                hexLogoBg: "#ffffff",
                 frontLeft: safeColor("#631b1b"), backLeft: safeColor("#631b1b"), midLeft: safeColor("#631b1b"),
                 frontRight: safeColor("#631b1b"), backRight: safeColor("#631b1b"), midRight: safeColor("#631b1b"),
                 waistband: safeColor("#250000"), sidelines: safeColor("white"), logoPanel: safeColor("white"),
                 bottomPiping: safeColor("white"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
+                hexLogoBg: "#4b4b4b",
                 frontLeft: safeColor("#ffbf00"), backLeft: safeColor("#ffbf00"), midLeft: safeColor("#ffbf00"),
                 frontRight: safeColor("#353535"), backRight: safeColor("#353535"), midRight: safeColor("#353535"),
                 waistband: safeColor("#4b4b4b"), sidelines: safeColor("#4b4b4b"), logoPanel: safeColor("#4b4b4b"),
                 bottomPiping: safeColor("white"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#303030",
                 frontLeft: safeColor("#c3ccec"), backLeft: safeColor("#c3ccec"), midLeft: safeColor("#412727"),
                 frontRight: safeColor("#c3ccec"), backRight: safeColor("#c3ccec"), midRight: safeColor("#412727"),
                 waistband: safeColor("#412727"), sidelines: safeColor("#303030"), logoPanel: safeColor("#303030"),
                 bottomPiping: safeColor("#c3ccec"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#4b4b4b",
                 frontLeft: safeColor("#789678"), backLeft: safeColor("#789678"), midLeft: safeColor("#789678"),
                 frontRight: safeColor("#789678"), backRight: safeColor("#789678"), midRight: safeColor("#789678"),
                 waistband: safeColor("#4b4b4b"), sidelines: safeColor("#4b4b4b"), logoPanel: safeColor("#4b4b4b"),
                 bottomPiping: safeColor("#789678"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#cecece",
                 frontLeft: safeColor("#331800"), backLeft: safeColor("#331800"), midLeft: safeColor("#331800"),
                 frontRight: safeColor("#9898ac"), backRight: safeColor("#9898ac"), midRight: safeColor("#9898ac"),
                 waistband: safeColor("#9898ac"), sidelines: safeColor("#cecece"), logoPanel: safeColor("#cecece"),
                 bottomPiping: safeColor("#9898ac"), stitching: safeColor("black"), useWhiteLogo: false
             },
             {
+                hexLogoBg: "#9b9b9b",
                 frontLeft: safeColor("#020101"), backLeft: safeColor("#020101"), midLeft: safeColor("#202044"),
                 frontRight: safeColor("#020101"), backRight: safeColor("#020101"), midRight: safeColor("#202044"),
                 waistband: safeColor("#020101"), sidelines: safeColor("#020101"), logoPanel: safeColor("#9b9b9b"),
                 bottomPiping: safeColor("#9b9b9b"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
+                hexLogoBg: "#9b9b9b",
                 frontLeft: safeColor("#b9a973"), backLeft: safeColor("#b9a973"), midLeft: safeColor("#b9a973"),
                 frontRight: safeColor("#b9a973"), backRight: safeColor("#b9a973"), midRight: safeColor("#b9a973"),
                 waistband: safeColor("#0f2c0f"), sidelines: safeColor("#0f2c0f"), logoPanel: safeColor("#9b9b9b"),
                 bottomPiping: safeColor("#9b9b9b"), stitching: safeColor("black"), useWhiteLogo: false
             },
             {
+                hexLogoBg: "#1c2513",
                 frontLeft: safeColor("#446970"), backLeft: safeColor("#446970"), midLeft: safeColor("#446970"),
                 frontRight: safeColor("#bebebe"), backRight: safeColor("#bebebe"), midRight: safeColor("#bebebe"),
                 waistband: safeColor("#bebebe"), sidelines: safeColor("#1c2513"), logoPanel: safeColor("#1c2513"),
                 bottomPiping: safeColor("black"), stitching: safeColor("white"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#b6b6b6",
                 frontLeft: safeColor("#c58c9c"), backLeft: safeColor("#c58c9c"), midLeft: safeColor("#5f5f80"),
                 frontRight: safeColor("#c58c9c"), backRight: safeColor("#c58c9c"), midRight: safeColor("#5f5f80"),
                 waistband: safeColor("#5f504f"), sidelines: safeColor("#b6b6b6"), logoPanel: safeColor("#b6b6b6"),
                 bottomPiping: safeColor("#b6b6b6"), stitching: safeColor("white"), useWhiteLogo: false
             },
             {
+                hexLogoBg: "#000000",
                 frontLeft: safeColor("#0a0030"), backLeft: safeColor("#0a0030"), midLeft: safeColor("#0a0030"),
                 frontRight: safeColor("#0a0030"), backRight: safeColor("#0a0030"), midRight: safeColor("#0a0030"),
                 waistband: safeColor("#5f504f"), sidelines: safeColor("#5f504f"), logoPanel: safeColor("black"),
                 bottomPiping: safeColor("white"), stitching: safeColor("black"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#2f2d38",
                 frontLeft: safeColor("#2e4b2e"), backLeft: safeColor("#2e4b2e"), midLeft: safeColor("#2e4b2e"),
                 frontRight: safeColor("#aa0000"), backRight: safeColor("#aa0000"), midRight: safeColor("#aa0000"),
                 waistband: safeColor("white"), sidelines: safeColor("white"), logoPanel: safeColor("#2f2d38"),
                 bottomPiping: safeColor("white"), stitching: safeColor("white"), useWhiteLogo: true
             },
             {
+                hexLogoBg: "#301c1c",
                 frontLeft: safeColor("#ff7633"), backLeft: safeColor("#ff7633"), midLeft: safeColor("#9898ac"),
                 frontRight: safeColor("#ff7633"), backRight: safeColor("#ff7633"), midRight: safeColor("#9898ac"),
                 waistband: safeColor("#9898ac"), sidelines: safeColor("#301c1c"), logoPanel: safeColor("#301c1c"),
@@ -144,28 +170,68 @@
 
         let comboIndex = 0;
 
+        // Helper function to pre-load image objects natively
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
         async function startColorAndBrandLoop() {
             const materials = viewer.model.materials;
 
-            let texKickerBlack, texKickerWhite, texTextBlack, texTextWhite;
+            let imgKickerBlack, imgKickerWhite, imgTextBlack, imgTextWhite;
             
-            try { texKickerBlack = await viewer.createTexture("logo-kicker-black.png"); } catch(e){}
-            try { texKickerWhite = await viewer.createTexture("logo-kicker-white.png"); } catch(e){}
-            try { texTextBlack = await viewer.createTexture("logo-text-black.png"); } catch(e){}
-            try { texTextWhite = await viewer.createTexture("logo-text-white.png"); } catch(e){}
+            // Native image preloading to feed the canvas painter
+            try { imgKickerBlack = await loadImage("logo-kicker-black.png"); } catch(e){}
+            try { imgKickerWhite = await loadImage("logo-kicker-white.png"); } catch(e){}
+            try { imgTextBlack = await loadImage("logo-text-black.png"); } catch(e){}
+            try { imgTextWhite = await loadImage("logo-text-white.png"); } catch(e){}
 
-            setInterval(() => {
+            setInterval(async () => {
                 const current = designCombos[comboIndex];
 
                 // Determine active brand logo image
                 const isEven = (comboIndex % 2 === 0);
-                const activeTex = isEven 
-                    ? (current.useWhiteLogo ? texKickerWhite : texKickerBlack)
-                    : (current.useWhiteLogo ? texTextWhite : texTextBlack);
+                const activeImg = isEven 
+                    ? (current.useWhiteLogo ? imgKickerWhite : imgKickerBlack)
+                    : (current.useWhiteLogo ? imgTextWhite : imgTextBlack);
 
-                // Exact match logic using your actual mesh names
+                // 1. Dynamic Canvas Rendering Block
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = formatHex(current.hexLogoBg);
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (activeImg) {
+                    // Centers and draws the logo graphic over the color fill
+                    const aspect = activeImg.width / activeImg.height;
+                    let drawW = canvas.width * 0.85;
+                    let drawH = drawW / aspect;
+                    
+                    if (drawH > canvas.height) {
+                        drawH = canvas.height * 0.85;
+                        drawW = drawH * aspect;
+                    }
+                    
+                    const x = (canvas.width - drawW) / 2;
+                    const y = (canvas.height - drawH) / 2;
+                    ctx.drawImage(activeImg, x, y, drawW, drawH);
+                }
+
+                // Convert the canvas composite to an engine texture map
+                const canvasDataUrl = canvas.toDataURL("image/png");
+                let blendedTexture = null;
+                try {
+                    blendedTexture = await viewer.createTexture(canvasDataUrl);
+                } catch(e) {}
+
+                // 2. Mesh Panel Mapping Loop
                 materials.forEach(material => {
-                    const name = material.name; // Keep original casing
+                    const name = material.name;
 
                     if (name === "FrontLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.frontLeft);
                     else if (name === "BackLeftPanel") material.pbrMetallicRoughness.setBaseColorFactor(current.backLeft);
@@ -178,23 +244,23 @@
                     else if (name === "BottomPiping") material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping);
                     else if (name === "Stitching") material.pbrMetallicRoughness.setBaseColorFactor(current.stitching);
                     
-                    // TARGETED LOGOPANEL LOGIC
+                    // Direct dynamic canvas injection into LogoPanel
                     else if (name === "LogoPanel") {
-                        // 1. Force the background panel color to change correctly
-                        material.pbrMetallicRoughness.setBaseColorFactor(current.logoPanel);
-                        
-                        // 2. Inject texture engine manually if missing, then apply the logo graphic
-                        if (activeTex) {
+                        if (blendedTexture) {
                             if (!material.pbrMetallicRoughness.baseColorTexture) {
                                 material.pbrMetallicRoughness.createTextureInfo();
                             }
                             if (material.pbrMetallicRoughness.baseColorTexture) {
-                                material.pbrMetallicRoughness.baseColorTexture.setTexture(activeTex);
+                                material.pbrMetallicRoughness.baseColorTexture.setTexture(blendedTexture);
                             }
+                            // Reset color filter to full white so it reads the texture accurately
+                            material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
+                        } else {
+                            material.pbrMetallicRoughness.setBaseColorFactor(current.logoPanel);
                         }
                     }
 
-                    // Satin shine factor updates
+                    // Satin finish properties
                     if (["FrontLeftPanel", "BackLeftPanel", "MidLeftPanel", "FrontRightPanel", "BackRightPanel", "MidRightPanel", "WaistBand", "Sidelines", "LogoPanel"].includes(name)) {
                         material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
                         material.pbrMetallicRoughness.setMetallicFactor(0.15); 
