@@ -17,12 +17,43 @@
             font-family: sans-serif;
             overflow: hidden;
         }
-        model-viewer {
+        
+        /* Master container to strictly lock elements in space */
+        .viewer-container {
+            position: relative;
             width: 95vw;
             height: 95vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
             transform: translateY(-5%);
             --poster-color: transparent;
         }
+
+        /* Pure HTML Screen Overlay - Separated from the glitched 3D canvas pipeline */
+        .fixed-logo-screen {
+            position: absolute;
+            top: 45%; /* Centers visually over the mid-crotch patch panel */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none; /* Allows click-and-drag rotation to pass through to the 3D model */
+            z-index: 10;
+            transition: opacity 0.1s ease-in-out;
+            opacity: 0; /* Hidden by default until JavaScript tracking approves visibility */
+        }
+
+        .fixed-logo-screen img {
+            width: 95px; /* Fits cleanly inside the patch boundaries */
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.4));
+        }
+
         .controls-hint {
             position: absolute;
             bottom: 20px;
@@ -30,57 +61,35 @@
             font-size: 14px;
             letter-spacing: 1px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-        }
-        
-        /* Fixed Decal Overlay Engine styling */
-        .brand-overlay {
-            position: absolute; /* Forces the browser to strictly follow the 3D coordinate system */
-            border: none;
-            background: transparent;
-            pointer-events: none; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.15s ease-in-out;
-        }
-        
-        /* CRITICAL FIX: Instantly hides the logo when it rotates to the back of the shorts */
-        .brand-overlay:not([data-visible]) {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .brand-overlay img {
-            width: 110px;        
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.35));
+            z-index: 5;
         }
     </style>
 </head>
 <body>
 
-    <model-viewer 
-        id="shortsViewer" 
-        src="MT SHORTS.glb" 
-        alt="CombatCustom Muay Thai Shorts" 
-        auto-rotate 
-        rotation-per-second="35deg"
-        interaction-prompt="none"
-        environment-image="neutral"
-        exposure="1.2"
-        shadow-intensity="1">
-        
-        <button class="brand-overlay" slot="hotspot-front-logo" data-position="0m 0.22m 0.16m" data-normal="0m 0m 1m">
-            <img id="decalGraphic" src="logo-kicker-black.png" alt="Brand Logo Placement">
-        </button>
-        
-    </model-viewer>
+    <div class="viewer-container">
+        <model-viewer 
+            id="shortsViewer" 
+            src="MT SHORTS.glb" 
+            alt="CombatCustom Muay Thai Shorts" 
+            auto-rotate 
+            rotation-per-second="35deg"
+            interaction-prompt="none"
+            environment-image="neutral"
+            exposure="1.2"
+            shadow-intensity="1">
+        </model-viewer>
 
-    <div class="controls-hint">CombatCustom Customizer Showcase</div>
+        <div id="logoWrapper" class="fixed-logo-screen">
+            <img id="decalGraphic" src="logo-kicker-black.png" alt="Brand Logo Placement">
+        </div>
+
+        <div class="controls-hint">CombatCustom Customizer Showcase</div>
+    </div>
 
     <script>
         const viewer = document.querySelector("#shortsViewer");
+        const logoWrapper = document.getElementById("logoWrapper");
         const decalImg = document.getElementById("decalGraphic");
 
         function safeColor(hexStr) {
@@ -178,10 +187,10 @@
         function startConfiguratorLoop() {
             const materials = viewer.model.materials;
 
+            // 1. Color Customizer Interval Engine
             setInterval(() => {
                 const current = designCombos[comboIndex];
 
-                // 1. Structural Mesh Panel Recoloring
                 materials.forEach(material => {
                     const name = material.name;
 
@@ -203,7 +212,6 @@
                     }
                 });
 
-                // 2. High-Fidelity Decal Swap Engine
                 const isEven = (comboIndex % 2 === 0);
                 if (isEven) {
                     decalImg.src = current.useWhiteLogo ? "logo-kicker-white.png" : "logo-kicker-black.png";
@@ -213,6 +221,23 @@
 
                 comboIndex = (comboIndex + 1) % designCombos.length;
             }, 1200);
+
+            // 2. High-Performance Rotation Tracker API
+            // Calculates orientation angles to control when the front panel is visible
+            viewer.addEventListener('camera-change', () => {
+                const theta = viewer.getCameraOrbit().theta;
+                
+                // Normalizes radian angles across rotation loops
+                let degreeAngle = (theta * (180 / Math.PI)) % 360;
+                if (degreeAngle < 0) degreeAngle += 360;
+
+                // Displays the logo overlay only when the camera faces the front panel
+                if (degreeAngle >= 295 || degreeAngle <= 65) {
+                    logoWrapper.style.opacity = "1";
+                } else {
+                    logoWrapper.style.opacity = "0"; // Instantly drops visibility when turned around
+                }
+            });
         }
 
         if (viewer.loaded) {
