@@ -32,18 +32,26 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         
-        /* Premium Decal Overlay styling for crisp logos */
+        /* Fixed Decal Overlay Engine styling */
         .brand-overlay {
+            position: absolute; /* Forces the browser to strictly follow the 3D coordinate system */
             border: none;
             background: transparent;
-            pointer-events: none; /* Prevents interference with user drag rotations */
+            pointer-events: none; 
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.2s ease-in-out;
+            transition: opacity 0.15s ease-in-out;
         }
+        
+        /* CRITICAL FIX: Instantly hides the logo when it rotates to the back of the shorts */
+        .brand-overlay:not([data-visible]) {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         .brand-overlay img {
-            width: 110px;        /* Smooth sizing controller */
+            width: 110px;        
             height: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.35));
@@ -189,7 +197,6 @@
                     else if (name === "BottomPiping") material.pbrMetallicRoughness.setBaseColorFactor(current.bottomPiping);
                     else if (name === "Stitching") material.pbrMetallicRoughness.setBaseColorFactor(current.stitching);
 
-                    // Smooth fabric finish pass
                     if (["FrontLeftPanel", "BackLeftPanel", "MidLeftPanel", "FrontRightPanel", "BackRightPanel", "MidRightPanel", "WaistBand", "Sidelines", "LogoPanel"].includes(name)) {
                         material.pbrMetallicRoughness.setRoughnessFactor(0.65); 
                         material.pbrMetallicRoughness.setMetallicFactor(0.15); 
