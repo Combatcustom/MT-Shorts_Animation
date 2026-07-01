@@ -41,11 +41,10 @@
             top: 29.5%; /* Centers it vertically on the patch */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 75px; /* Adjust size to fit the panel neatly */
+            width: 32px; /* Adjusted size to fit the waistband panel neatly */
             height: auto;
-            pointer-events: none; /* Allows user to drag the 3D model through the image */
+            pointer-events: none; /* Keeps it completely non-interactive */
             z-index: 10;
-            transition: opacity 0.2s ease-in-out;
         }
 
         .controls {
@@ -62,7 +61,8 @@
             id="shorts-viewer" 
             src="MT SHORTS.glb" 
             alt="3D Custom Combat Shorts" 
-            camera-controls
+            auto-rotate
+            rotation-per-second="30deg"
             shadow-intensity="1">
         </model-viewer>
         
@@ -71,7 +71,7 @@
 
     <div class="controls">
         <h3>Customizer Loop Active</h3>
-        <p>Swapping fabric colors and screen logos every 1.4 seconds.</p>
+        <p>Swapping all fabric panels and logos every 1.4 seconds.</p>
     </div>
 
     <script>
@@ -91,13 +91,15 @@
 
             const currentDesign = designCycle[currentIndex];
 
-            // 1. Swap the fabric color on the 3D model panels natively
-            const baseMaterial = viewer.model.materials.find(m => m.name === 'FrontLeftPanel');
-            if (baseMaterial) {
-                baseMaterial.pbrMetallicRoughness.setBaseColorFactor(currentDesign.color);
-            }
+            // 1. Loop through ALL materials on the file so the whole short shifts color
+            viewer.model.materials.forEach(material => {
+                // Skip the waistband logo panel so it stays white/neutral background
+                if (material.name !== 'LogoPanel' && material.pbrMetallicRoughness) {
+                    material.pbrMetallicRoughness.setBaseColorFactor(currentDesign.color);
+                }
+            });
 
-            // 2. Safely swap the logo layer source on top of the 3D viewer frame
+            // 2. Swap the logo layer source
             logoImg.src = currentDesign.logo;
 
             currentIndex = (currentIndex + 1) % designCycle.length;
@@ -105,7 +107,7 @@
 
         // Initialize once model data passes validation
         viewer.addEventListener('load', () => {
-            console.log("3D engine ready. Screen synchronization active.");
+            console.log("3D engine ready. Global panel sync active.");
             setInterval(runCustomizerLoop, 1400);
         });
     </script>
