@@ -20,8 +20,8 @@
         model-viewer {
             width: 95vw;
             height: 95vh;
-            /* 💡 Increased shift to nudge the shorts distinctly higher up on the screen */
-            transform: translateY(12%);
+            /* 💡 Negative translation lifts the model directly up into the vertical center of the screen */
+            transform: translateY(-5%);
             --poster-color: transparent;
         }
         .controls-hint {
@@ -37,7 +37,7 @@
 <body>
 
     <model-viewer 
-        id="shortsViewerV2" 
+        id="shortsViewerV3" 
         src="MT SHORTS.glb" 
         alt="CombatCustom Muay Thai Shorts" 
         auto-rotate 
@@ -51,7 +51,7 @@
     <div class="controls-hint">CombatCustom Customizer Showcase</div>
 
     <script>
-        const viewer = document.querySelector("#shortsViewerV2");
+        const viewer = document.querySelector("#shortsViewerV3");
 
         function parseColor(input) {
             const clean = input.trim().toLowerCase();
