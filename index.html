@@ -20,8 +20,8 @@
         model-viewer {
             width: 95vw;
             height: 95vh;
-            /* Reset transform to let the camera properties handle the perfect center */
-            transform: translateY(0%);
+            /* 💡 Safely shifts the model slightly higher up the viewport via CSS layout */
+            transform: translateY(4%);
             --poster-color: transparent;
         }
         .controls-hint {
@@ -45,9 +45,7 @@
         interaction-prompt="none"
         environment-image="neutral"
         exposure="1.2"
-        shadow-intensity="1"
-        camera-orbit="0deg 86deg 2.1m"
-        camera-target="0m 0.12m 0m">
+        shadow-intensity="1">
     </model-viewer>
 
     <div class="controls-hint">CombatCustom Customizer Showcase</div>
@@ -89,4 +87,52 @@
             {
                 frontLeft: parseColor("#c3ccec"), backLeft: parseColor("#c3ccec"), midLeft: parseColor("#412727"),
                 frontRight: parseColor("#c3ccec"), backRight: parseColor("#c3ccec"), midRight: parseColor("#412727"),
-                waistband: parseColor("#412727"), sidelines: parse
+                waistband: parseColor("#412727"), sidelines: parseColor("#303030"), logoPanel: parseColor("#303030"),
+                bottomPiping: parseColor("#c3ccec"), stitching: parseColor("black")
+            },
+            {
+                frontLeft: parseColor("#789678"), backLeft: parseColor("#789678"), midLeft: parseColor("#789678"),
+                frontRight: parseColor("#789678"), backRight: parseColor("#789678"), midRight: parseColor("#789678"),
+                waistband: parseColor("#4b4b4b"), sidelines: parseColor("#4b4b4b"), logoPanel: parseColor("#4b4b4b"),
+                bottomPiping: parseColor("#789678"), stitching: parseColor("black")
+            },
+            {
+                frontLeft: parseColor("#331800"), backLeft: parseColor("#331800"), midLeft: parseColor("#331800"),
+                frontRight: parseColor("#9898ac"), backRight: parseColor("#9898ac"), midRight: parseColor("#9898ac"),
+                waistband: parseColor("#9898ac"), sidelines: parseColor("#cecece"), logoPanel: parseColor("#cecece"),
+                bottomPiping: parseColor("#9898ac"), stitching: parseColor("black")
+            },
+            {
+                frontLeft: parseColor("#020101"), backLeft: parseColor("#020101"), midLeft: parseColor("#202044"),
+                frontRight: parseColor("#020101"), backRight: parseColor("#020101"), midRight: parseColor("#202044"),
+                waistband: parseColor("#020101"), sidelines: parseColor("#020101"), logoPanel: parseColor("#9b9b9b"),
+                bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("white")
+            },
+            {
+                frontLeft: parseColor("#b9a973"), backLeft: parseColor("#b9a973"), midLeft: parseColor("#b9a973"),
+                frontRight: parseColor("#b9a973"), backRight: parseColor("#b9a973"), midRight: parseColor("#b9a973"),
+                waistband: parseColor("#0f2c0f"), sidelines: parseColor("#0f2c0f"), logoPanel: parseColor("#9b9b9b"),
+                bottomPiping: parseColor("#9b9b9b"), stitching: parseColor("Black")
+            },
+            {
+                frontLeft: parseColor("#446970"), backLeft: parseColor("#446970"), midLeft: parseColor("#446970"),
+                frontRight: parseColor("#bebebe"), backRight: parseColor("#bebebe"), midRight: parseColor("#bebebe"),
+                waistband: parseColor("#bebebe"), sidelines: parseColor("#1c2513"), logoPanel: parseColor("#1c2513"),
+                bottomPiping: parseColor("black"), stitching: parseColor("white")
+            },
+            {
+                frontLeft: parseColor("#c58c9c"), backLeft: parseColor("#c58c9c"), midLeft: parseColor("#5f5f80"),
+                frontRight: parseColor("#c58c9c"), backRight: parseColor("#c58c9c"), midRight: parseColor("#5f5f80"),
+                waistband: parseColor("#5f504f"), sidelines: parseColor("#b6b6b6"), logoPanel: parseColor("#b6b6b6"),
+                bottomPiping: parseColor("#b6b6b6"), stitching: parseColor("white")
+            },
+            {
+                frontLeft: parseColor("#0a0030"), backLeft: parseColor("#0a0030"), midLeft: parseColor("#0a0030"),
+                frontRight: parseColor("#0a0030"), backRight: parseColor("#0a0030"), midRight: parseColor("#0a0030"),
+                waistband: parseColor("#5f504f"), sidelines: parseColor("#5f504f"), logoPanel: parseColor("black"),
+                bottomPiping: parseColor("white"), stitching: parseColor("black")
+            },
+            {
+                frontLeft: parseColor("#2e4b2e"), backLeft: parseColor("#2e4b2e"), midLeft: parseColor("#2e4b2e"),
+                frontRight: parseColor("#aa0000"), backRight: parseColor("#aa0000"), midRight: parseColor("#aa0000"),
+                waistband: parseColor("white"), sidelines: parseColor("white"), logoPanel: parseColor("#2f2d38"),
